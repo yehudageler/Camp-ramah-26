@@ -6,6 +6,7 @@ import CommunityWall from './components/CommunityWall';
 import PackingList from './components/PackingList';
 import { defaultPackingList } from './constants/packingList';
 import Suggestions from './components/Suggestions';
+import AdminPanel from './components/AdminPanel';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -14,6 +15,8 @@ export default function App() {
   const [checkedStates, setCheckedStates] = useState({});
   const [customItems, setCustomItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [packingStates, setPackingStates] = useState([]);
 
   const syncData = async (user) => {
     try {
@@ -31,10 +34,10 @@ export default function App() {
         .select("*")
         .order("created_at", { ascending: false });
       if (!sError) {
-        setSuggestions(sugs?.map(s => ({ text: s.text, date: new Date(s.created_at).toLocaleDateString("he-IL") })) || []);
+        setSuggestions(sugs || []);
       }
 
-      // 3. Fetch packing states
+      // 3. Fetch packing states for current user
       const { data: pState, error: psError } = await supabase
         .from("packing_states")
         .select("*")
@@ -44,6 +47,16 @@ export default function App() {
       if (!psError && pState) {
         setCheckedStates(pState.checked_items || {});
         setCustomItems(pState.custom_items || []);
+      }
+
+      // 4. If admin, fetch all packing states for tracking
+      if (user.email === 'geleryehuda@gmail.com') {
+        const { data: allStates, error: allError } = await supabase
+          .from("packing_states")
+          .select("*");
+        if (!allError) {
+          setPackingStates(allStates || []);
+        }
       }
     } catch (err) {
       console.error("Failed to sync data from Supabase:", err);
@@ -257,7 +270,24 @@ export default function App() {
               </div>
             </div>
             
-            <div>
+            <div style={{ display: 'flex', gap: '0.8rem' }}>
+              {currentUser.email === 'geleryehuda@gmail.com' && (
+                <button 
+                  onClick={() => setShowAdminPanel(true)}
+                  style={{
+                    backgroundColor: 'var(--forest-green)',
+                    color: 'var(--white-card)',
+                    border: 'none',
+                    padding: '0.5rem 1rem',
+                    borderRadius: 'var(--radius-md)',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    fontFamily: 'Fredoka, sans-serif'
+                  }}
+                >
+                  🛠️ פאנל ניהול
+                </button>
+              )}
               <button className="logout-btn" onClick={logoutUser}>התנתק 🚪</button>
             </div>
           </header>
@@ -279,10 +309,19 @@ export default function App() {
           />
 
           <Suggestions 
-            suggestions={suggestions}
             onSubmitSuggestion={handleSubmitSuggestion}
           />
         </main>
+      )}
+
+      {showAdminPanel && (
+        <AdminPanel 
+          suggestions={suggestions}
+          counselors={databaseProfiles}
+          packingStates={packingStates}
+          defaultPackingList={defaultPackingList}
+          onClose={() => setShowAdminPanel(false)}
+        />
       )}
     </div>
   );

@@ -1,13 +1,16 @@
 import { useState } from 'react';
 
-export default function Suggestions({ suggestions, onSubmitSuggestion }) {
+export default function Suggestions({ onSubmitSuggestion }) {
   const [feedback, setFeedback] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!feedback.trim()) return;
     onSubmitSuggestion(feedback.trim());
     setFeedback("");
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 4000);
   };
 
   return (
@@ -40,22 +43,21 @@ export default function Suggestions({ suggestions, onSubmitSuggestion }) {
           <button type="submit" className="btn-secondary">שלח הצעה 🚀</button>
         </form>
 
-        <div className="suggestions-list-preview">
-          {suggestions.length === 0 ? (
-            <h4 style={{ color: 'var(--text-muted)', fontWeight: 'normal', fontSize: '0.85rem' }}>
-              אין הצעות קודמות עדיין. תהיו הראשונים להציע!
-            </h4>
-          ) : (
-            <>
-              <h4>הצעות שהתקבלו לאחרונה:</h4>
-              {suggestions.slice(-3).reverse().map((s, index) => (
-                <div className="suggestion-bubble" key={index}>
-                  <strong>[{s.date}]</strong> {s.text}
-                </div>
-              ))}
-            </>
-          )}
-        </div>
+        {showSuccess && (
+          <div style={{
+            marginTop: '1rem',
+            padding: '0.8rem',
+            backgroundColor: 'var(--forest-green-light)',
+            color: 'var(--forest-green)',
+            borderRadius: 'var(--radius-sm)',
+            fontWeight: '600',
+            textAlign: 'center',
+            border: '1px solid rgba(30, 70, 32, 0.15)',
+            animation: 'check-pop 0.3s ease-out'
+          }}>
+            תודה! ההצעה שלך נשלחה ישירות למנהל הפורטל 📬
+          </div>
+        )}
       </div>
     </section>
   );
