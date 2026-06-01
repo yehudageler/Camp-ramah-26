@@ -309,7 +309,7 @@ export default function AuthScreen({ onAuthSuccess }) {
               </div>
 
               <div className="form-group">
-                <label className="form-label">העלו תמונת פרופיל שלכם (חובה - כדי שכולם יראו את הפרצוף שלכם! 📸)</label>
+                <label className="form-label">העלו תמונת פרופיל שלכם כדי שכולם יראו את הפנים היפות שלכם! 📸</label>
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginTop: '0.5rem' }}>
                   <input 
                     type="file" 
