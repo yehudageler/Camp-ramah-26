@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase, isSupabaseActive } from '../lib/supabase';
+import { processImage } from '../lib/imageUtils';
 
 export function AvatarSVG({ avatarType, size = 60 }) {
   if (avatarType && (avatarType.startsWith('data:image/') || avatarType.startsWith('http'))) {
@@ -64,6 +65,7 @@ export default function AuthScreen({ onAuthSuccess }) {
   
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const toggleAuthMode = (e) => {
     e.preventDefault();
@@ -82,9 +84,10 @@ export default function AuthScreen({ onAuthSuccess }) {
       return;
     }
 
-    if (isSupabaseActive) {
-      if (authMode === "signup") {
-        try {
+    setSubmitting(true);
+    try {
+      if (isSupabaseActive) {
+        if (authMode === "signup") {
           const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             email,
             password
@@ -136,12 +139,8 @@ export default function AuthScreen({ onAuthSuccess }) {
             
             onAuthSuccess(user);
           }
-        } catch (err) {
-          setErrorMsg("שגיאת הרשמה: " + err.message);
-        }
-      } else {
-        // Login mode
-        try {
+        } else {
+          // Login mode
           const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
             email,
             password
@@ -170,34 +169,36 @@ export default function AuthScreen({ onAuthSuccess }) {
             setSuccessMsg("התחברתם בהצלחה!");
             onAuthSuccess(user);
           }
-        } catch (err) {
-          setErrorMsg("שגיאת התחברות: " + err.message);
         }
-      }
-    } else {
-      // Local fallback
-      if (authMode === "signup") {
-        const user = {
-          name,
-          email,
-          role,
-          avatar
-        };
-        localStorage.setItem("ramah_user", JSON.stringify(user));
-        onAuthSuccess(user);
       } else {
-        const storedUser = localStorage.getItem("ramah_user");
-        if (storedUser) {
-          const parsed = JSON.parse(storedUser);
-          if (parsed.email === email) {
-            onAuthSuccess(parsed);
+        // Local fallback
+        if (authMode === "signup") {
+          const user = {
+            name,
+            email,
+            role,
+            avatar
+          };
+          localStorage.setItem("ramah_user", JSON.stringify(user));
+          onAuthSuccess(user);
+        } else {
+          const storedUser = localStorage.getItem("ramah_user");
+          if (storedUser) {
+            const parsed = JSON.parse(storedUser);
+            if (parsed.email === email) {
+              onAuthSuccess(parsed);
+            } else {
+              setErrorMsg("לא נמצא משתמש מקומי תואם. אנא הירשמו קודם.");
+            }
           } else {
             setErrorMsg("לא נמצא משתמש מקומי תואם. אנא הירשמו קודם.");
           }
-        } else {
-          setErrorMsg("לא נמצא משתמש מקומי תואם. אנא הירשמו קודם.");
         }
       }
+    } catch (err) {
+      setErrorMsg(authMode === "signup" ? "שגיאת הרשמה: " + err.message : "שגיאת התחברות: " + err.message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -314,15 +315,17 @@ export default function AuthScreen({ onAuthSuccess }) {
                     type="file" 
                     accept="image/*" 
                     id="avatar-upload"
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const file = e.target.files[0];
                       if (file) {
-                        setAvatarFile(file);
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          setAvatar(reader.result);
-                        };
-                        reader.readAsDataURL(file);
+                        try {
+                          setErrorMsg("");
+                          const processed = await processImage(file, { forceSquare: true, targetSize: 300 });
+                          setAvatarFile(processed.file);
+                          setAvatar(processed.dataUrl);
+                        } catch (err) {
+                          setErrorMsg(err.message || "שגיאה בעיבוד התמונה");
+                        }
                       }
                     }}
                     style={{ display: 'none' }}
@@ -363,8 +366,11 @@ export default function AuthScreen({ onAuthSuccess }) {
             </>
           )}
 
-          <button type="submit" className="btn-primary">
-            {authMode === "signup" ? "הרשמה וכניסה למחנה! 🚀" : "התחברות 🔑"}
+          <button type="submit" className="btn-primary" disabled={submitting}>
+            {submitting 
+              ? (authMode === "signup" ? "נרשם ומעלה תמונה... ⏳" : "מתחבר... ⏳")
+              : (authMode === "signup" ? "הרשמה וכניסה למחנה! 🚀" : "התחברות 🔑")
+            }
           </button>
         </form>
 

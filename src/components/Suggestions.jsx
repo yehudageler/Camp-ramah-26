@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { processImage } from '../lib/imageUtils';
 
 export default function Suggestions({ 
   isAdmin, 
@@ -28,15 +29,17 @@ export default function Suggestions({
   };
 
   // 2. Handle image file selection
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result);
-      };
-      reader.readAsDataURL(file);
+      try {
+        const processed = await processImage(file, { maxDim: 1200 });
+        setSelectedFile(processed.file);
+        setPreviewUrl(processed.dataUrl);
+      } catch (err) {
+        console.error("Error processing photo:", err);
+        alert("שגיאה בעיבוד התמונה. נא לנסות קובץ אחר.");
+      }
     }
   };
 
