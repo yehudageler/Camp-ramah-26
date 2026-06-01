@@ -259,6 +259,10 @@ h1, h2, h3, h4, .font-heading {
   gap: 1rem;
 }
 
+#user-avatar-container:hover .avatar-hover-overlay {
+  opacity: 1 !important;
+}
+
 .user-avatar-main {
   width: 60px;
   height: 60px;

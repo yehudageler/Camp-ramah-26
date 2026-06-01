@@ -5,6 +5,7 @@ import Countdown from './components/Countdown';
 import CommunityWall from './components/CommunityWall';
 import PackingList from './components/PackingList';
 import LayaTip from './components/LayaTip';
+import { processImage } from './lib/imageUtils';
 import { defaultPackingList } from './constants/packingList';
 import Suggestions from './components/Suggestions';
 import AdminPanel from './components/AdminPanel';
@@ -335,6 +336,68 @@ export default function App() {
     }
   };
 
+  const handleUpdateAvatar = async (fileObj) => {
+    if (!currentUser) return;
+    
+    if (isSupabaseActive) {
+      try {
+        const fileExt = fileObj.name.split('.').pop() || 'jpg';
+        const fileName = `${currentUser.id}-${Date.now()}.${fileExt}`;
+        
+        // 1. Upload new avatar
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(fileName, fileObj);
+          
+        if (uploadError) throw uploadError;
+        
+        // 2. Get public URL
+        const { data: publicUrlData } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(fileName);
+        const newAvatarUrl = publicUrlData.publicUrl;
+        
+        const oldAvatar = currentUser.avatar;
+        
+        // 3. Update profiles table
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .update({ avatar: newAvatarUrl })
+          .eq("id", currentUser.id);
+          
+        if (profileError) throw profileError;
+        
+        // 4. Update currentUser state
+        setCurrentUser(prev => ({ ...prev, avatar: newAvatarUrl }));
+        
+        // 5. Refresh database profiles list
+        setDatabaseProfiles(prev => prev.map(p => p.id === currentUser.id ? { ...p, avatar: newAvatarUrl } : p));
+        
+        // 6. Delete old avatar from storage
+        if (oldAvatar && oldAvatar.includes('/public/avatars/')) {
+          const parts = oldAvatar.split('/public/avatars/');
+          if (parts.length > 1) {
+            const oldFileName = parts[1];
+            await supabase.storage.from('avatars').remove([oldFileName]);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to update avatar:", err);
+        alert("שגיאה בעדכון תמונת הפרופיל: " + err.message);
+      }
+    } else {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result;
+        const updatedUser = { ...currentUser, avatar: base64 };
+        setCurrentUser(updatedUser);
+        localStorage.setItem("ramah_user", JSON.stringify(updatedUser));
+        setDatabaseProfiles(prev => prev.map(p => p.id === currentUser.id ? { ...p, avatar: base64 } : p));
+      };
+      reader.readAsDataURL(fileObj);
+    }
+  };
+
   const handleDeleteUser = async (userId) => {
     if (!window.confirm("האם אתה בטוח שברצונך למחוק משתמש זה? כל נתוני האריזה והפרופיל שלו יימחקו מהקיר.")) return;
     
@@ -437,8 +500,60 @@ export default function App() {
           {/* Top Navigation & User profile widget */}
           <header className="dashboard-header">
             <div className="user-profile-widget">
-              <div id="user-avatar-container">
+              <div 
+                id="user-avatar-container"
+                style={{
+                  position: 'relative',
+                  cursor: 'pointer',
+                  borderRadius: '50%',
+                  overflow: 'hidden',
+                  width: '60px',
+                  height: '60px'
+                }}
+                title="לחצו לעדכון תמונת הפרופיל 📸"
+              >
                 <AvatarSVG avatarType={currentUser.avatar} size={60} />
+                <label 
+                  htmlFor="header-avatar-upload"
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0, 0, 0, 0.4)',
+                    color: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    opacity: 0,
+                    transition: 'opacity 0.2s',
+                    cursor: 'pointer',
+                    fontSize: '1.1rem',
+                    borderRadius: '50%',
+                    margin: 0
+                  }}
+                  className="avatar-hover-overlay"
+                >
+                  📸
+                </label>
+                <input 
+                  type="file"
+                  accept="image/*"
+                  id="header-avatar-upload"
+                  style={{ display: 'none' }}
+                  onChange={async (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      try {
+                        const processed = await processImage(file, { forceSquare: true, targetSize: 300 });
+                        await handleUpdateAvatar(processed.file);
+                      } catch (err) {
+                        alert(err.message || "שגיאה בעיבוד התמונה");
+                      }
+                    }
+                  }}
+                />
               </div>
               <div className="user-info-text">
                 <div className="user-name" id="display-name">{currentUser.name}</div>
