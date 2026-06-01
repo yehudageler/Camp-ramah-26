@@ -139,13 +139,13 @@ export default function PackingList({ checkedStates, customItems, onToggleItem, 
               💳 טיפ קטן ממני (מניסיון לקראת הטיסה)
             </h4>
             <p style={{ margin: 0, fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
-              אם אתם מחפשים דרך נוחה לשלם בדולרים בארה"ב בלי עמלות המרה יקרות, כרטיס האשראי של <strong>לאיה (Laya)</strong> הוא פתרון מעולה.
-              בנוסף, אם תירשמו דרך הלינק הזה, גם אתם וגם אני נקבל 5$ במתנה אחרי שתשתמשו ב-100$ הראשונים שלכם במחנה. בלי שום לחץ, רק המלצה ידידותית!
+              אם אתם מחפשים דרך נוחה לשלם בדולרים בארה"ב בלי עמלות המרה יקרות, כרטיס האשראי של <strong>לאיה (Laya)</strong> הוא פתרון מעולה. 
+              אם תירשמו עם קוד ההטבה <strong>F7Z9E8</strong> ותבצעו רכישות ב-$500 במצטבר, גם אתם וגם אני נקבל $5 במתנה! בלי שום לחץ, רק המלצה ידידותית.
             </p>
             <div style={{ marginTop: '0.6rem' }}>
-              <a
-                href="#" // User can customize this URL easily
-                target="_blank"
+              <a 
+                href="https://laya.onelink.me/5Liq?code=F7Z9E8"
+                target="_blank" 
                 rel="noopener noreferrer"
                 style={{
                   color: 'var(--campfire-amber)',
@@ -157,7 +157,7 @@ export default function PackingList({ checkedStates, customItems, onToggleItem, 
                   gap: '4px'
                 }}
               >
-                להזמנת כרטיס לאיה וקבלת ההטבה 🔗
+                להזמנת כרטיס לאיה עם קוד ההטבה 🔗
               </a>
             </div>
           </div>
