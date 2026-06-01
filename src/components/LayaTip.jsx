@@ -1,7 +1,7 @@
 export default function LayaTip() {
   return (
-    <div 
-      className="info-card" 
+    <div
+      className="info-card"
       style={{
         marginTop: '2rem',
         padding: '1.5rem',
@@ -28,25 +28,25 @@ export default function LayaTip() {
         }}
       />
       <div style={{ flex: '1 1 280px', textAlign: 'right' }}>
-        <h4 style={{ 
-          color: 'var(--forest-green)', 
-          margin: '0 0 0.5rem 0', 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '0.5rem', 
+        <h4 style={{
+          color: 'var(--forest-green)',
+          margin: '0 0 0.5rem 0',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
           fontSize: '1rem',
           fontFamily: 'Fredoka, sans-serif'
         }}>
           <span>💳</span> טיפ קטן ממני (מניסיון לקראת הטיסה)
         </h4>
         <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
-          אם אתם מחפשים דרך נוחה לשלם בדולרים בארה"ב בלי עמלות המרה יקרות, כרטיס האשראי של <strong>לאיה (Laya)</strong> הוא פתרון מעולה. 
-          אם תירשמו עם קוד ההטבה <strong>F7Z9E8</strong> ותבצעו רכישות ב-$500 במצטבר, גם אתם וגם אני נקבל $5 במתנה! בלי שום לחץ, רק המלצה ידידותית.
+          אם אתם מחפשים דרך נוחה לשלם בדולרים בארה"ב בלי עמלות המרה יקרות, כרטיס האשראי של <strong>לאיה (Laya)</strong> הוא פתרון מעולה.
+          אם תירשמו עם קוד ההטבה <strong>F7Z9E8</strong> ותבצעו רכישות ב-$500 במצטבר, גם אתם וגם אני נקבל $5 במתנה! בלי לחץ, רק הצעה ידידותית :)
         </p>
         <div style={{ marginTop: '0.8rem' }}>
-          <a 
+          <a
             href="https://laya.onelink.me/5Liq?code=F7Z9E8"
-            target="_blank" 
+            target="_blank"
             rel="noopener noreferrer"
             style={{
               color: 'var(--campfire-amber)',
