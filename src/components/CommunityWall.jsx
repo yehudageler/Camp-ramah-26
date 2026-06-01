@@ -1,63 +1,7 @@
 import { useState } from 'react';
 import CounselorCard from './CounselorCard';
 
-const mockCounselors = [
-  {
-    name: "בר סלע",
-    role: "ראש אגם (Waterfront Director)",
-    avatar: "canoe",
-    funStats: {
-      "סובלנות ליתושים": "10%",
-      "התמכרות לקרם הגנה": "100%",
-      "שיר אהוב במחנה": "מישמיש ושיר האגם",
-      "משפט קבוע": "אף אחד לא נכנס למים בלי מציל מוסמך!"
-    }
-  },
-  {
-    name: "דנה כהן",
-    role: "מדריכת עדה (Cabin Counselor)",
-    avatar: "campfire",
-    funStats: {
-      "סובלנות ליתושים": "40%",
-      "התמכרות לקפה שחור": "95%",
-      "שיר אהוב במחנה": "על הדבש ועל העוקץ",
-      "משפט קבוע": "חבר'ה, מי שלא מנקה ב'ניקיון' לא יוצא ל'חוג'!"
-    }
-  },
-  {
-    name: "עידן לוי",
-    role: "מדריך ספורט (Sports Counselor)",
-    avatar: "guitar",
-    funStats: {
-      "סובלנות ליתושים": "80%",
-      "רמת אנרגיה כללית": "120%",
-      "שיר אהוב במחנה": "אצל הדודה והדוד",
-      "משפט קבוע": "כולם לרוץ למגרש, פעולת ספורט מתחילה עכשיו!"
-    }
-  },
-  {
-    name: "נועה מזור",
-    role: "מדריכת אומנות (Arts Counselor)",
-    avatar: "pine",
-    funStats: {
-      "סובלנות ליתושים": "50%",
-      "התמכרות לדבק חם": "110%",
-      "שיר אהוב במחנה": "לו יהי",
-      "משפט קבוע": "נא לא ללכלך את השולחנות של הבית-עם!"
-    }
-  },
-  {
-    name: "גל רפאל",
-    role: "שליח ותיק (Returning Vet)",
-    avatar: "campfire",
-    funStats: {
-      "סובלנות ליתושים": "100% (חסין)",
-      "התמכרות לוולמארט": "90%",
-      "שיר אהוב במחנה": "ערב של שושנים",
-      "משפט קבוע": "בשנה שעברה בוויסקונסין היה הרבה יותר קר, תאמינו לי..."
-    }
-  }
-];
+const mockCounselors = [];
 
 export default function CommunityWall({ currentUser, databaseProfiles, packingProgress }) {
   const [searchQuery, setSearchQuery] = useState("");
