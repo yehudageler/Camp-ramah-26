@@ -126,19 +126,23 @@ export default function Suggestions({
                 borderRadius: 'var(--radius-md)',
                 overflow: 'hidden',
                 backgroundColor: '#1a202c',
-                aspectRatio: '16/9',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: 'inset 0 0 10px rgba(0,0,0,0.5)'
+                boxShadow: 'inset 0 0 10px rgba(0,0,0,0.5)',
+                width: '100%',
+                maxHeight: '480px'
               }}>
                 <img 
                   src={dailyPhotos[currentIndex].image_data} 
                   alt={dailyPhotos[currentIndex].caption || "תמונה יומית"} 
                   style={{
                     maxWidth: '100%',
-                    maxHeight: '100%',
-                    objectFit: 'contain'
+                    maxHeight: '480px',
+                    width: 'auto',
+                    height: 'auto',
+                    objectFit: 'contain',
+                    display: 'block'
                   }}
                 />
               </div>
