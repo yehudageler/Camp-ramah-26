@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { defaultPackingList } from '../constants/packingList';
 
-export default function PackingList({ checkedStates, customItems, onToggleItem, onAddItem, progressPercentage }) {
+export default function PackingList({ checkedStates, customItems, onToggleItem, onDeleteItem, onAddItem, progressPercentage }) {
   const [currentTab, setCurrentTab] = useState("clothing");
   const [customInput, setCustomInput] = useState("");
 
-  const listItems = currentTab === "custom" 
+  const listItems = (currentTab === "custom" 
     ? customItems 
-    : (defaultPackingList[currentTab] || []);
+    : (defaultPackingList[currentTab] || []))
+    .filter(item => checkedStates[item.id] !== 'deleted');
 
   const isWarning = currentTab === "warning";
 
@@ -61,10 +62,28 @@ export default function PackingList({ checkedStates, customItems, onToggleItem, 
               <div 
                 key={item.id} 
                 className={`check-item ${isChecked ? 'checked' : ''} ${isWarning ? 'warning-item' : ''}`}
-                onClick={() => !isWarning && onToggleItem(item.id)}
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}
               >
-                <div className="custom-checkbox"></div>
-                <span className="check-item-text">{item.text}</span>
+                <div 
+                  onClick={() => !isWarning && onToggleItem(item.id)}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexGrow: 1 }}
+                >
+                  <div className="custom-checkbox"></div>
+                  <span className="check-item-text">{item.text}</span>
+                </div>
+
+                {!isWarning && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteItem(item.id);
+                    }}
+                    className="delete-item-btn"
+                    title="מחק פריט ✕"
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
             );
           })}

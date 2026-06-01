@@ -978,3 +978,29 @@ h1, h2, h3, h4, .font-heading {
     min-width: 100%;
   }
 }
+
+/* Delete Item Button (fades in on hover) */
+.delete-item-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 4px 8px;
+  border-radius: 50%;
+  opacity: 0;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.check-item:hover .delete-item-btn {
+  opacity: 0.6;
+}
+
+.check-item:hover .delete-item-btn:hover {
+  opacity: 1;
+  color: var(--red-warning);
+  background-color: var(--red-light);
+}

@@ -277,25 +277,56 @@ export default function App() {
     }
   };
 
+  const handleDeletePackingItem = async (itemId) => {
+    const newCheckedStates = {
+      ...checkedStates,
+      [itemId]: 'deleted'
+    };
+    setCheckedStates(newCheckedStates);
+
+    const newCustomItems = customItems.filter(item => item.id !== itemId);
+    setCustomItems(newCustomItems);
+
+    if (isSupabaseActive && currentUser?.id) {
+      try {
+        await supabase.from("packing_states").upsert({
+          user_id: currentUser.id,
+          checked_items: newCheckedStates,
+          custom_items: newCustomItems,
+          updated_at: new Date()
+        });
+      } catch (err) {
+        console.error("Error deleting packing item:", err);
+      }
+    } else {
+      localStorage.setItem("ramah_checked_states", JSON.stringify(newCheckedStates));
+      localStorage.setItem("ramah_custom_items", JSON.stringify(newCustomItems));
+    }
+  };
+
   const getProgressPercentage = () => {
     const activeLists = ["clothing", "wearables", "miscellaneous", "niceToHave"];
-    let totalItems = customItems.length;
+    let totalItems = 0;
     let checkedCount = 0;
     
     activeLists.forEach(category => {
       const list = defaultPackingList[category] || [];
-      totalItems += list.length;
-      
       list.forEach(item => {
-        if (checkedStates[item.id]) {
-          checkedCount++;
+        if (checkedStates[item.id] !== 'deleted') {
+          totalItems++;
+          if (checkedStates[item.id] === true) {
+            checkedCount++;
+          }
         }
       });
     });
     
     customItems.forEach(item => {
-      if (checkedStates[item.id]) {
-        checkedCount++;
+      if (checkedStates[item.id] !== 'deleted') {
+        totalItems++;
+        if (checkedStates[item.id] === true) {
+          checkedCount++;
+        }
       }
     });
     
@@ -369,6 +400,7 @@ export default function App() {
             checkedStates={checkedStates}
             customItems={customItems}
             onToggleItem={handleToggleItem}
+            onDeleteItem={handleDeletePackingItem}
             onAddItem={handleAddItem}
             progressPercentage={getProgressPercentage()}
           />
