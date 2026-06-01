@@ -666,6 +666,17 @@ h1, h2, h3, h4, .font-heading {
   margin-bottom: 2rem;
   overflow-x: auto;
   padding-bottom: 0.5rem;
+  /* Native app-like scrolling */
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.packing-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .tab-btn {
@@ -680,6 +691,8 @@ h1, h2, h3, h4, .font-heading {
   transition: var(--transition);
   white-space: nowrap;
   color: var(--text-muted);
+  scroll-snap-align: start;
+  flex-shrink: 0;
 }
 
 .tab-btn:hover {

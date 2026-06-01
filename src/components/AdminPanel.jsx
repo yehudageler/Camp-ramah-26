@@ -220,7 +220,7 @@ export default function AdminPanel({ suggestions, counselors, packingStates, def
                         <p style={{ fontSize: '1.1rem', margin: '0 0 0.8rem 0', fontWeight: '500' }}>"{s.text}"</p>
                         <div style={{ display: 'flex', gap: '1rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                           <span>👤 מאת: <strong>{s.user_name}</strong></span>
-                          <span>📅 תאריך: {new Date(s.created_at || Date.now()).toLocaleString("he-IL")}</span>
+                          <span>📅 תאריך: {s.created_at ? new Date(s.created_at).toLocaleString("he-IL") : "חדש"}</span>
                         </div>
                       </div>
                       <button
