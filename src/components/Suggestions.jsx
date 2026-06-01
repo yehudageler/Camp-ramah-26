@@ -1,9 +1,23 @@
 import { useState } from 'react';
 
-export default function Suggestions({ onSubmitSuggestion }) {
+export default function Suggestions({ 
+  isAdmin, 
+  dailyPhotos = [], 
+  onUploadPhoto, 
+  onDeletePhoto, 
+  onSubmitSuggestion 
+}) {
   const [feedback, setFeedback] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
+  
+  // Photo states
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [uploadCaption, setUploadCaption] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
 
+  // 1. Submit suggestion
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!feedback.trim()) return;
@@ -13,34 +27,283 @@ export default function Suggestions({ onSubmitSuggestion }) {
     setTimeout(() => setShowSuccess(false), 4000);
   };
 
+  // 2. Handle image file selection
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // 3. Handle image upload submission
+  const handleUploadSubmit = async (e) => {
+    e.preventDefault();
+    if (!previewUrl) return;
+
+    setUploading(true);
+    try {
+      await onUploadPhoto(previewUrl, uploadCaption);
+      setSelectedFile(null);
+      setPreviewUrl("");
+      setUploadCaption("");
+      setCurrentIndex(0); // Reset viewer to see the newly uploaded newest photo
+    } catch (err) {
+      console.error("Failed to upload photo:", err);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleNextPhoto = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
+  };
+
+  const handlePrevPhoto = () => {
+    if (currentIndex < dailyPhotos.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    }
+  };
+
+  const handleDeleteCurrent = async () => {
+    if (!window.confirm("האם למחוק תמונה זו לצמיתות?")) return;
+    const photoToDelete = dailyPhotos[currentIndex];
+    if (photoToDelete && onDeletePhoto) {
+      try {
+        await onDeletePhoto(photoToDelete.id);
+        // Adjust index if we deleted the last photo
+        if (currentIndex >= dailyPhotos.length - 1 && currentIndex > 0) {
+          setCurrentIndex(currentIndex - 1);
+        }
+      } catch (err) {
+        console.error("Failed to delete photo:", err);
+      }
+    }
+  };
+
   return (
     <section className="suggestions-section">
-      {/* Future Features List */}
-      <div className="info-card">
-        <h3 style={{ color: 'var(--forest-green)', marginBottom: '0.8rem' }}>✨ מה מתוכנן לשלב הבא?</h3>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginBottom: '1.2rem' }}>האתר נמצא כרגע בגרסת פיילוט ראשונית. הנה הפיצ'רים שיושקו בקרוב:</p>
-        <ul className="coming-soon-list">
-          <li>מילון הסלנג העברי-אנגלי-קמפי של רמה</li>
-          <li>מפת סודות וטיפים של המחנה (מבוסס מיקום)</li>
-          <li>לוח סאונדים וציטוטים מוכרים מהמחנה</li>
-          <li>מחולל רעיונות לפעולות ערב לחוצות</li>
-        </ul>
+      
+      {/* 📸 DAILY PHOTO GALLERY CARD */}
+      <div className="info-card" style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
+        <h3 style={{ color: 'var(--forest-green)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span>📸</span> פינת התמונה היומית
+        </h3>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.2rem' }}>
+          כאן תעלה כל יום תמונה יפה ומרגשת מהמחנה! עקבו אחרי הרגעים המשותפים.
+        </p>
+
+        {/* Gallery Display */}
+        <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          {dailyPhotos.length === 0 ? (
+            <div style={{
+              border: '2px dashed var(--forest-green-light)',
+              borderRadius: 'var(--radius-md)',
+              padding: '2.5rem 1rem',
+              textAlign: 'center',
+              color: 'var(--text-muted)',
+              backgroundColor: '#fafbf9'
+            }}>
+              <span style={{ fontSize: '2.5rem' }}>🏕️</span>
+              <h4 style={{ marginTop: '0.5rem', fontWeight: '500' }}>אין תמונה יומית עדיין</h4>
+              <p style={{ fontSize: '0.8rem' }}>יהודה יעלה תמונות בקרוב, יש למה לחכות!</p>
+            </div>
+          ) : (
+            <div style={{ position: 'relative', width: '100%' }}>
+              
+              {/* Image Frame */}
+              <div style={{
+                position: 'relative',
+                borderRadius: 'var(--radius-md)',
+                overflow: 'hidden',
+                backgroundColor: '#1a202c',
+                aspectRatio: '16/9',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: 'inset 0 0 10px rgba(0,0,0,0.5)'
+              }}>
+                <img 
+                  src={dailyPhotos[currentIndex].image_data} 
+                  alt={dailyPhotos[currentIndex].caption || "תמונה יומית"} 
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    objectFit: 'contain'
+                  }}
+                />
+              </div>
+
+              {/* Caption & Date Overlay */}
+              <div style={{
+                marginTop: '0.8rem',
+                backgroundColor: 'var(--white-card)',
+                padding: '0.8rem',
+                borderRadius: 'var(--radius-sm)',
+                borderRight: '4px solid var(--campfire-amber)'
+              }}>
+                <p style={{ fontWeight: '600', fontSize: '0.95rem', margin: 0 }}>
+                  {dailyPhotos[currentIndex].caption || "ללא כיתוב"}
+                </p>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  📅 הועלה ב- {new Date(dailyPhotos[currentIndex].created_at).toLocaleDateString("he-IL")}
+                </span>
+              </div>
+
+              {/* Carousel controls */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: '1rem',
+                gap: '1rem'
+              }}>
+                <button 
+                  onClick={handlePrevPhoto} 
+                  disabled={currentIndex === dailyPhotos.length - 1}
+                  className="tab-btn"
+                  style={{
+                    padding: '0.4rem 1rem',
+                    opacity: currentIndex === dailyPhotos.length - 1 ? 0.5 : 1,
+                    cursor: currentIndex === dailyPhotos.length - 1 ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  → קודמת (ישנה יותר)
+                </button>
+                
+                <span style={{ fontWeight: 'bold', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                  {currentIndex + 1} / {dailyPhotos.length}
+                </span>
+
+                <button 
+                  onClick={handleNextPhoto} 
+                  disabled={currentIndex === 0}
+                  className="tab-btn"
+                  style={{
+                    padding: '0.4rem 1rem',
+                    opacity: currentIndex === 0 ? 0.5 : 1,
+                    cursor: currentIndex === 0 ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  הבאה (חדשה יותר) ←
+                </button>
+              </div>
+
+              {/* Delete Button (Admin Only) */}
+              {isAdmin && (
+                <div style={{ textAlign: 'center', marginTop: '0.8rem' }}>
+                  <button 
+                    onClick={handleDeleteCurrent}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--red-warning)',
+                      cursor: 'pointer',
+                      fontSize: '0.85rem',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    🗑️ מחק תמונה זו
+                  </button>
+                </div>
+              )}
+
+            </div>
+          )}
+        </div>
+
+        {/* ADMIN UPLOAD FORM */}
+        {isAdmin && (
+          <div style={{
+            marginTop: '1.5rem',
+            paddingTop: '1.5rem',
+            borderTop: '1px solid var(--forest-green-light)'
+          }}>
+            <h4 style={{ color: 'var(--campfire-amber)', marginBottom: '0.5rem', fontSize: '0.95rem' }}>
+              🔧 העלאת תמונה יומית (מנהל בלבד)
+            </h4>
+            
+            <form onSubmit={handleUploadSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  id="daily-photo-file"
+                  onChange={handleFileChange}
+                  style={{ display: 'none' }}
+                  required={!previewUrl}
+                />
+                <label 
+                  htmlFor="daily-photo-file" 
+                  className="tab-btn"
+                  style={{
+                    display: 'inline-block',
+                    padding: '0.5rem 1rem',
+                    backgroundColor: 'var(--forest-green-light)',
+                    color: 'var(--forest-green)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {selectedFile ? "שנה תמונה 🖼️" : "בחר תמונה 🖼️"}
+                </label>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '150px' }}>
+                  {selectedFile ? selectedFile.name : "לא נבחר קובץ"}
+                </span>
+              </div>
+
+              {previewUrl && (
+                <div style={{ position: 'relative', width: '100px', aspectRatio: '16/9', borderRadius: '4px', overflow: 'hidden', border: '1px solid #cbd5e1' }}>
+                  <img src={previewUrl} alt="תצוגה מקדימה" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+              )}
+
+              <input 
+                type="text" 
+                className="add-item-input" 
+                placeholder="הוסיפו כיתוב מעניין לתמונה..."
+                value={uploadCaption}
+                onChange={(e) => setUploadCaption(e.target.value)}
+                style={{ padding: '0.5rem 0.8rem', fontSize: '0.9rem' }}
+              />
+
+              <button 
+                type="submit" 
+                className="btn-primary" 
+                disabled={uploading || !previewUrl}
+                style={{ margin: 0, padding: '0.6rem' }}
+              >
+                {uploading ? "מעלה תמונה..." : "פרסם תמונה יומית 🚀"}
+              </button>
+            </form>
+          </div>
+        )}
       </div>
 
-      {/* Suggestions input box */}
+      {/* 💡 WARM SUGGESTIONS CARD */}
       <div className="feedback-card">
-        <h3>💡 איזה פיצ'רים בא לכם שיהיו באתר?</h3>
-        <p>יש לכם רעיון מגניב שיעזור לשליחים? תכתבו לנו אותו כאן ונפתח אותו בשלבים הבאים!</p>
+        <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span>💡</span> בואו נבנה את זה ביחד!
+        </h3>
+        <p style={{ fontSize: '0.95rem', lineHeight: '1.5' }}>
+          האתר הזה הוא של כולנו! נשמח לשמוע רעיונות לפיצ'רים חדשים, כלים שיעזרו לנו לקראת המחנה, משחקים, או סתם בדיחות שיעשו לנו שמח בלב. כל הצעה תגיע ישירות ליהודה.
+        </p>
         
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} style={{ marginTop: '1.2rem' }}>
           <textarea 
             className="feedback-textarea" 
-            placeholder="ספרו לנו על פיצ'ר, כלי, משחק או מידע שהיה עוזר לכם לקראת המחנה..." 
+            placeholder="ספרו לנו על רעיון, כלי, משחק או מידע שהיה עוזר לכם או מצחיק אותנו..." 
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
             required
+            style={{ minHeight: '120px' }}
           ></textarea>
-          <button type="submit" className="btn-secondary">שלח הצעה 🚀</button>
+          <button type="submit" className="btn-secondary" style={{ marginTop: '0.8rem' }}>שלח הצעה ליהודה 🚀</button>
         </form>
 
         {showSuccess && (
@@ -55,7 +318,7 @@ export default function Suggestions({ onSubmitSuggestion }) {
             border: '1px solid rgba(30, 70, 32, 0.15)',
             animation: 'check-pop 0.3s ease-out'
           }}>
-            תודה! ההצעה שלך נשלחה ישירות למנהל הפורטל 📬
+            תודה! ההצעה שלך נשלחה ישירות ליהודה 📬
           </div>
         )}
       </div>

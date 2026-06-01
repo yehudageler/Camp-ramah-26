@@ -17,6 +17,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [packingStates, setPackingStates] = useState([]);
+  const [dailyPhotos, setDailyPhotos] = useState([]);
 
   const syncData = async (user) => {
     try {
@@ -57,6 +58,15 @@ export default function App() {
         if (!allError) {
           setPackingStates(allStates || []);
         }
+      }
+
+      // 5. Fetch daily photos
+      const { data: photos, error: phError } = await supabase
+        .from("daily_photos")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (!phError) {
+        setDailyPhotos(photos || []);
       }
     } catch (err) {
       console.error("Failed to sync data from Supabase:", err);
@@ -105,6 +115,11 @@ export default function App() {
         const storedSuggestions = localStorage.getItem("ramah_suggestions");
         if (storedSuggestions) {
           setSuggestions(JSON.parse(storedSuggestions));
+        }
+
+        const storedPhotos = localStorage.getItem("ramah_daily_photos");
+        if (storedPhotos) {
+          setDailyPhotos(JSON.parse(storedPhotos));
         }
       }
       setLoading(false);
@@ -212,6 +227,56 @@ export default function App() {
     }
   };
 
+  const handleUploadPhoto = async (imageData, caption) => {
+    const newPhoto = {
+      image_data: imageData,
+      caption: caption
+    };
+
+    if (isSupabaseActive) {
+      try {
+        const { data, error } = await supabase
+          .from("daily_photos")
+          .insert(newPhoto)
+          .select()
+          .single();
+        if (error) throw error;
+        setDailyPhotos(prev => [data, ...prev]);
+      } catch (err) {
+        console.error("Error uploading daily photo:", err);
+      }
+    } else {
+      const localPhoto = {
+        id: Date.now(),
+        image_data: imageData,
+        caption: caption,
+        created_at: new Date().toISOString()
+      };
+      const updatedPhotos = [localPhoto, ...dailyPhotos];
+      setDailyPhotos(updatedPhotos);
+      localStorage.setItem("ramah_daily_photos", JSON.stringify(updatedPhotos));
+    }
+  };
+
+  const handleDeletePhoto = async (photoId) => {
+    if (isSupabaseActive) {
+      try {
+        const { error } = await supabase
+          .from("daily_photos")
+          .delete()
+          .eq("id", photoId);
+        if (error) throw error;
+        setDailyPhotos(prev => prev.filter(p => p.id !== photoId));
+      } catch (err) {
+        console.error("Error deleting daily photo:", err);
+      }
+    } else {
+      const updatedPhotos = dailyPhotos.filter(p => p.id !== photoId);
+      setDailyPhotos(updatedPhotos);
+      localStorage.setItem("ramah_daily_photos", JSON.stringify(updatedPhotos));
+    }
+  };
+
   const getProgressPercentage = () => {
     const activeLists = ["clothing", "wearables", "miscellaneous", "niceToHave"];
     let totalItems = customItems.length;
@@ -309,6 +374,10 @@ export default function App() {
           />
 
           <Suggestions 
+            isAdmin={currentUser.email === 'geleryehuda@gmail.com'}
+            dailyPhotos={dailyPhotos}
+            onUploadPhoto={handleUploadPhoto}
+            onDeletePhoto={handleDeletePhoto}
             onSubmitSuggestion={handleSubmitSuggestion}
           />
         </main>
