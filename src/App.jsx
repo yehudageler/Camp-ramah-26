@@ -4,6 +4,7 @@ import AuthScreen, { AvatarSVG } from './components/AuthScreen';
 import Countdown from './components/Countdown';
 import CommunityWall from './components/CommunityWall';
 import PackingList from './components/PackingList';
+import LayaTip from './components/LayaTip';
 import { defaultPackingList } from './constants/packingList';
 import Suggestions from './components/Suggestions';
 import AdminPanel from './components/AdminPanel';
@@ -442,6 +443,8 @@ export default function App() {
             onAddItem={handleAddItem}
             progressPercentage={getProgressPercentage()}
           />
+
+          <LayaTip />
 
           <Suggestions 
             isAdmin={currentUser.email === 'geleryehuda@gmail.com'}

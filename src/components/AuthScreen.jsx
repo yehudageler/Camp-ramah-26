@@ -76,6 +76,11 @@ export default function AuthScreen({ onAuthSuccess }) {
     setErrorMsg("");
     setSuccessMsg("");
 
+    if (authMode === "signup" && !avatar) {
+      setErrorMsg("חובה להעלות תמונת פרופיל כדי להירשם! 📸");
+      return;
+    }
+
     if (isSupabaseActive) {
       if (authMode === "signup") {
         try {
@@ -235,6 +240,7 @@ export default function AuthScreen({ onAuthSuccess }) {
               placeholder="israel@gmail.com" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
               required 
             />
           </div>
@@ -249,6 +255,7 @@ export default function AuthScreen({ onAuthSuccess }) {
               minLength="6" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              autoComplete={authMode === "signup" ? "new-password" : "current-password"}
               required 
             />
           </div>
