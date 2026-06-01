@@ -5,8 +5,8 @@ export default function PackingList({ checkedStates, customItems, onToggleItem, 
   const [currentTab, setCurrentTab] = useState("clothing");
   const [customInput, setCustomInput] = useState("");
 
-  const listItems = (currentTab === "custom" 
-    ? customItems 
+  const listItems = (currentTab === "custom"
+    ? customItems
     : (defaultPackingList[currentTab] || []))
     .filter(item => checkedStates[item.id] !== 'deleted');
 
@@ -24,7 +24,7 @@ export default function PackingList({ checkedStates, customItems, onToggleItem, 
       <h2 className="section-title" style={{ marginBottom: '0.5rem' }}>
         <span>🎒</span> מה לארוז למחנה?
       </h2>
-      
+
       <div className="packing-tip-box">
         <span style={{ fontSize: '1.5rem' }}>💡</span>
         <p className="packing-tip-text">
@@ -59,12 +59,12 @@ export default function PackingList({ checkedStates, customItems, onToggleItem, 
           {listItems.map((item) => {
             const isChecked = !!checkedStates[item.id];
             return (
-              <div 
-                key={item.id} 
+              <div
+                key={item.id}
                 className={`check-item ${isChecked ? 'checked' : ''} ${isWarning ? 'warning-item' : ''}`}
                 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}
               >
-                <div 
+                <div
                   onClick={() => !isWarning && onToggleItem(item.id)}
                   style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexGrow: 1 }}
                 >
@@ -98,13 +98,13 @@ export default function PackingList({ checkedStates, customItems, onToggleItem, 
       {/* Add custom item form */}
       {currentTab === "custom" && (
         <form className="add-item-form" onSubmit={handleAddSubmit}>
-          <input 
-            type="text" 
-            className="add-item-input" 
-            placeholder="הוסיפו פריט אישי שלכם לרשימה..." 
+          <input
+            type="text"
+            className="add-item-input"
+            placeholder="הוסיפו פריט אישי שלכם לרשימה..."
             value={customInput}
             onChange={(e) => setCustomInput(e.target.value)}
-            required 
+            required
           />
           <button type="submit" className="btn-add-item">הוסף פריט ➕</button>
         </form>
@@ -123,9 +123,9 @@ export default function PackingList({ checkedStates, customItems, onToggleItem, 
           alignItems: 'center',
           flexWrap: 'wrap'
         }}>
-          <img 
-            src="/laya_card.png" 
-            alt="Laya Card" 
+          <img
+            src="/laya_card.png"
+            alt="Laya Card"
             style={{
               width: '90px',
               height: 'auto',
@@ -136,16 +136,16 @@ export default function PackingList({ checkedStates, customItems, onToggleItem, 
           />
           <div style={{ flex: '1 1 240px' }}>
             <h4 style={{ color: 'var(--forest-green)', margin: '0 0 0.4rem 0', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.95rem' }}>
-              💳 טיפ קטן מאיתנו (מניסיון לקראת הטיסה)
+              💳 טיפ קטן ממני (מניסיון לקראת הטיסה)
             </h4>
             <p style={{ margin: 0, fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
-              אם אתם מחפשים דרך נוחה לשלם בדולרים בארה"ב בלי עמלות המרה יקרות, כרטיס האשראי של <strong>לאיה (Laya)</strong> הוא פתרון מעולה. 
-              בנוסף, אם תירשמו דרך הלינק הזה, גם אתם וגם יהודה תקבלו 5$ במתנה אחרי שתבזבזו את ה-100$ הראשונים שלכם במחנה. בלי שום לחץ, רק המלצה ידידותית!
+              אם אתם מחפשים דרך נוחה לשלם בדולרים בארה"ב בלי עמלות המרה יקרות, כרטיס האשראי של <strong>לאיה (Laya)</strong> הוא פתרון מעולה.
+              בנוסף, אם תירשמו דרך הלינק הזה, גם אתם וגם אני נקבל 5$ במתנה אחרי שתשתמשו ב-100$ הראשונים שלכם במחנה. בלי שום לחץ, רק המלצה ידידותית!
             </p>
             <div style={{ marginTop: '0.6rem' }}>
-              <a 
+              <a
                 href="#" // User can customize this URL easily
-                target="_blank" 
+                target="_blank"
                 rel="noopener noreferrer"
                 style={{
                   color: 'var(--campfire-amber)',
