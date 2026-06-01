@@ -228,19 +228,36 @@ export default function App() {
     }
   };
 
-  const handleUploadPhoto = async (imageData, caption) => {
-    const newPhoto = {
-      image_data: imageData,
-      caption: caption
-    };
-
+  const handleUploadPhoto = async (fileObj, previewUrl, caption) => {
     if (isSupabaseActive) {
       try {
+        let imageUrl = previewUrl; // Fallback
+        if (fileObj) {
+          const fileExt = fileObj.name.split('.').pop() || 'jpg';
+          const fileName = `${Date.now()}.${fileExt}`;
+          const { error: uploadError } = await supabase.storage
+            .from('daily-photos')
+            .upload(fileName, fileObj);
+          
+          if (uploadError) {
+            console.error("Daily photo upload error:", uploadError);
+          } else {
+            const { data: publicUrlData } = supabase.storage
+              .from('daily-photos')
+              .getPublicUrl(fileName);
+            imageUrl = publicUrlData.publicUrl;
+          }
+        }
+
         const { data, error } = await supabase
           .from("daily_photos")
-          .insert(newPhoto)
+          .insert({
+            image_data: imageUrl,
+            caption: caption
+          })
           .select()
           .single();
+          
         if (error) throw error;
         setDailyPhotos(prev => [data, ...prev]);
       } catch (err) {
@@ -249,7 +266,7 @@ export default function App() {
     } else {
       const localPhoto = {
         id: Date.now(),
-        image_data: imageData,
+        image_data: previewUrl,
         caption: caption,
         created_at: new Date().toISOString()
       };
@@ -260,6 +277,9 @@ export default function App() {
   };
 
   const handleDeletePhoto = async (photoId) => {
+    const photoToDelete = dailyPhotos.find(p => p.id === photoId);
+    if (!photoToDelete) return;
+
     if (isSupabaseActive) {
       try {
         const { error } = await supabase
@@ -267,6 +287,16 @@ export default function App() {
           .delete()
           .eq("id", photoId);
         if (error) throw error;
+        
+        // Remove file from storage if it belongs to Supabase Storage
+        if (photoToDelete.image_data && photoToDelete.image_data.includes('/public/daily-photos/')) {
+          const parts = photoToDelete.image_data.split('/public/daily-photos/');
+          if (parts.length > 1) {
+            const fileName = parts[1];
+            await supabase.storage.from('daily-photos').remove([fileName]);
+          }
+        }
+        
         setDailyPhotos(prev => prev.filter(p => p.id !== photoId));
       } catch (err) {
         console.error("Error deleting daily photo:", err);
@@ -310,13 +340,24 @@ export default function App() {
     
     if (isSupabaseActive) {
       try {
+        const profileToDelete = databaseProfiles.find(p => p.id === userId);
+        
         // 1. Delete packing state
         await supabase.from("packing_states").delete().eq("user_id", userId);
         // 2. Delete profile
         const { error } = await supabase.from("profiles").delete().eq("id", userId);
         if (error) throw error;
         
-        // 3. Update local states
+        // 3. Delete avatar from Storage if it exists
+        if (profileToDelete && profileToDelete.avatar && profileToDelete.avatar.includes('/public/avatars/')) {
+          const parts = profileToDelete.avatar.split('/public/avatars/');
+          if (parts.length > 1) {
+            const fileName = parts[1];
+            await supabase.storage.from('avatars').remove([fileName]);
+          }
+        }
+        
+        // 4. Update local states
         setDatabaseProfiles(prev => prev.filter(p => p.id !== userId));
         setPackingStates(prev => prev.filter(state => state.user_id !== userId));
       } catch (err) {

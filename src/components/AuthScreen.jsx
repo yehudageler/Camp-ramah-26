@@ -60,6 +60,7 @@ export default function AuthScreen({ onAuthSuccess }) {
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
   const [avatar, setAvatar] = useState("");
+  const [avatarFile, setAvatarFile] = useState(null);
   
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -92,6 +93,24 @@ export default function AuthScreen({ onAuthSuccess }) {
           if (signUpError) throw signUpError;
           
           if (signUpData.user) {
+            let avatarUrl = avatar;
+            if (avatarFile) {
+              const fileExt = avatarFile.name.split('.').pop() || 'jpg';
+              const fileName = `${signUpData.user.id}-${Date.now()}.${fileExt}`;
+              const { error: uploadError } = await supabase.storage
+                .from('avatars')
+                .upload(fileName, avatarFile);
+              
+              if (uploadError) {
+                console.error("Storage upload error:", uploadError);
+              } else {
+                const { data: publicUrlData } = supabase.storage
+                  .from('avatars')
+                  .getPublicUrl(fileName);
+                avatarUrl = publicUrlData.publicUrl;
+              }
+            }
+
             // Create database profile
             const { error: profileError } = await supabase
               .from("profiles")
@@ -100,7 +119,7 @@ export default function AuthScreen({ onAuthSuccess }) {
                 full_name: name,
                 email: email,
                 role: role,
-                avatar: avatar
+                avatar: avatarUrl
               });
               
             if (profileError) throw profileError;
@@ -112,7 +131,7 @@ export default function AuthScreen({ onAuthSuccess }) {
               email: email,
               name: name,
               role: role,
-              avatar: avatar
+              avatar: avatarUrl
             };
             
             onAuthSuccess(user);
@@ -298,6 +317,7 @@ export default function AuthScreen({ onAuthSuccess }) {
                     onChange={(e) => {
                       const file = e.target.files[0];
                       if (file) {
+                        setAvatarFile(file);
                         const reader = new FileReader();
                         reader.onloadend = () => {
                           setAvatar(reader.result);

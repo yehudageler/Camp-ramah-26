@@ -47,7 +47,7 @@ export default function Suggestions({
 
     setUploading(true);
     try {
-      await onUploadPhoto(previewUrl, uploadCaption);
+      await onUploadPhoto(selectedFile, previewUrl, uploadCaption);
       setSelectedFile(null);
       setPreviewUrl("");
       setUploadCaption("");
