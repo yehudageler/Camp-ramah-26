@@ -109,6 +109,60 @@ export default function PackingList({ checkedStates, customItems, onToggleItem, 
           <button type="submit" className="btn-add-item">הוסף פריט ➕</button>
         </form>
       )}
+
+      {/* Laya card recommendation tip */}
+      {!isWarning && (
+        <div style={{
+          marginTop: '2.5rem',
+          padding: '1.2rem',
+          backgroundColor: '#f8fafc',
+          borderRadius: 'var(--radius-md)',
+          border: '1px solid var(--forest-green-light)',
+          display: 'flex',
+          gap: '1.2rem',
+          alignItems: 'center',
+          flexWrap: 'wrap'
+        }}>
+          <img 
+            src="/laya_card.png" 
+            alt="Laya Card" 
+            style={{
+              width: '90px',
+              height: 'auto',
+              borderRadius: '8px',
+              boxShadow: '0 4px 10px rgba(0,0,0,0.08)',
+              flexShrink: 0
+            }}
+          />
+          <div style={{ flex: '1 1 240px' }}>
+            <h4 style={{ color: 'var(--forest-green)', margin: '0 0 0.4rem 0', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.95rem' }}>
+              💳 טיפ קטן מאיתנו (מניסיון לקראת הטיסה)
+            </h4>
+            <p style={{ margin: 0, fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+              אם אתם מחפשים דרך נוחה לשלם בדולרים בארה"ב בלי עמלות המרה יקרות, כרטיס האשראי של <strong>לאיה (Laya)</strong> הוא פתרון מעולה. 
+              בנוסף, אם תירשמו דרך הלינק הזה, גם אתם וגם יהודה תקבלו 5$ במתנה אחרי שתבזבזו את ה-100$ הראשונים שלכם במחנה. בלי שום לחץ, רק המלצה ידידותית!
+            </p>
+            <div style={{ marginTop: '0.6rem' }}>
+              <a 
+                href="#" // User can customize this URL easily
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{
+                  color: 'var(--campfire-amber)',
+                  fontWeight: 'bold',
+                  fontSize: '0.88rem',
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                להזמנת כרטיס לאיה וקבלת ההטבה 🔗
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
