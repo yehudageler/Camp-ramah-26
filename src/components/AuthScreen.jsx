@@ -2,6 +2,23 @@ import { useState } from 'react';
 import { supabase, isSupabaseActive } from '../lib/supabase';
 
 export function AvatarSVG({ avatarType, size = 60 }) {
+  if (avatarType && (avatarType.startsWith('data:image/') || avatarType.startsWith('http'))) {
+    return (
+      <img 
+        src={avatarType} 
+        alt="פרופיל" 
+        style={{
+          width: size,
+          height: size,
+          borderRadius: '50%',
+          border: '3px solid var(--forest-green)',
+          objectFit: 'cover',
+          display: 'block'
+        }}
+      />
+    );
+  }
+
   let emoji = "🔥";
   let bgColor = "#fff3e0";
   
@@ -37,12 +54,12 @@ export function AvatarSVG({ avatarType, size = 60 }) {
 }
 
 export default function AuthScreen({ onAuthSuccess }) {
-  const [authMode, setAuthMode] = useState("signup"); // "signup" or "login"
+  const [authMode, setAuthMode] = useState("login"); // "signup" or "login"
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
-  const [avatar, setAvatar] = useState("campfire");
+  const [avatar, setAvatar] = useState("");
   
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -265,25 +282,55 @@ export default function AuthScreen({ onAuthSuccess }) {
               </div>
 
               <div className="form-group">
-                <label className="form-label">בחרו אווטאר שליחים</label>
-                <div className="avatar-selection">
-                  {[
-                    { type: 'campfire', color: '#fff3e0', emoji: '🔥' },
-                    { type: 'pine', color: '#e8f5e9', emoji: '🌲' },
-                    { type: 'canoe', color: '#e1f5fe', emoji: '🛶' },
-                    { type: 'guitar', color: '#f3e5f5', emoji: '🎸' }
-                  ].map((opt) => (
-                    <div 
-                      key={opt.type}
-                      className={`avatar-option ${avatar === opt.type ? 'selected' : ''}`}
-                      onClick={() => setAvatar(opt.type)}
-                    >
-                      <svg viewBox="0 0 100 100" width="100%" height="100%">
-                        <circle cx="50" cy="50" r="48" fill={opt.color}/>
-                        <text x="50" y="60" fontSize="40" textAnchor="middle">{opt.emoji}</text>
-                      </svg>
-                    </div>
-                  ))}
+                <label className="form-label">העלו תמונת פרופיל שלכם (חובה - כדי שכולם יראו את הפרצוף שלכם! 📸)</label>
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginTop: '0.5rem' }}>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    id="avatar-upload"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setAvatar(reader.result);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    style={{ display: 'none' }}
+                    required
+                  />
+                  <label 
+                    htmlFor="avatar-upload" 
+                    className="tab-btn"
+                    style={{
+                      display: 'inline-block',
+                      padding: '0.6rem 1.2rem',
+                      backgroundColor: 'var(--forest-green-light)',
+                      color: 'var(--forest-green)',
+                      cursor: 'pointer',
+                      borderRadius: 'var(--radius-md)',
+                      fontWeight: 'bold',
+                      border: '2px solid var(--forest-green)',
+                      margin: 0
+                    }}
+                  >
+                    {avatar && avatar.startsWith('data:image/') ? "שנה תמונה 📸" : "בחר תמונת פנים 📸"}
+                  </label>
+                  {avatar && avatar.startsWith('data:image/') && (
+                    <img 
+                      src={avatar} 
+                      alt="Preview" 
+                      style={{
+                        width: '50px',
+                        height: '50px',
+                        borderRadius: '50%',
+                        objectFit: 'cover',
+                        border: '2px solid var(--forest-green)'
+                      }}
+                    />
+                  )}
                 </div>
               </div>
             </>

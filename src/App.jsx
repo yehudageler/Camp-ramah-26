@@ -304,6 +304,44 @@ export default function App() {
     }
   };
 
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm("האם אתה בטוח שברצונך למחוק משתמש זה? כל נתוני האריזה והפרופיל שלו יימחקו מהקיר.")) return;
+    
+    if (isSupabaseActive) {
+      try {
+        // 1. Delete packing state
+        await supabase.from("packing_states").delete().eq("user_id", userId);
+        // 2. Delete profile
+        const { error } = await supabase.from("profiles").delete().eq("id", userId);
+        if (error) throw error;
+        
+        // 3. Update local states
+        setDatabaseProfiles(prev => prev.filter(p => p.id !== userId));
+        setPackingStates(prev => prev.filter(state => state.user_id !== userId));
+      } catch (err) {
+        console.error("Failed to delete user:", err);
+      }
+    } else {
+      setDatabaseProfiles(prev => prev.filter(p => p.id !== userId));
+    }
+  };
+
+  const handleDeleteSuggestion = async (suggestionId) => {
+    if (!window.confirm("האם למחוק הצעה זו?")) return;
+    
+    if (isSupabaseActive) {
+      try {
+        const { error } = await supabase.from("suggestions").delete().eq("id", suggestionId);
+        if (error) throw error;
+        setSuggestions(prev => prev.filter(s => s.id !== suggestionId));
+      } catch (err) {
+        console.error("Failed to delete suggestion:", err);
+      }
+    } else {
+      setSuggestions(prev => prev.filter(s => s.id !== suggestionId));
+    }
+  };
+
   const getProgressPercentage = () => {
     const activeLists = ["clothing", "wearables", "miscellaneous", "niceToHave"];
     let totalItems = 0;
@@ -421,6 +459,8 @@ export default function App() {
           counselors={databaseProfiles}
           packingStates={packingStates}
           defaultPackingList={defaultPackingList}
+          onDeleteUser={handleDeleteUser}
+          onDeleteSuggestion={handleDeleteSuggestion}
           onClose={() => setShowAdminPanel(false)}
         />
       )}

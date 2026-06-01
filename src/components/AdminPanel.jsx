@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function AdminPanel({ suggestions, counselors, packingStates, defaultPackingList, onClose }) {
+export default function AdminPanel({ suggestions, counselors, packingStates, defaultPackingList, onDeleteUser, onDeleteSuggestion, onClose }) {
   const [activeTab, setActiveTab] = useState("suggestions"); // "suggestions" or "counselors"
 
   // 1. Calculate packing progress for a given user
@@ -214,7 +214,7 @@ export default function AdminPanel({ suggestions, counselors, packingStates, def
                       border: '1px solid var(--forest-green-light)',
                       display: 'flex',
                       justifyContent: 'space-between',
-                      alignItems: 'flex-start'
+                      alignItems: 'center'
                     }}>
                       <div style={{ flexGrow: 1 }}>
                         <p style={{ fontSize: '1.1rem', margin: '0 0 0.8rem 0', fontWeight: '500' }}>"{s.text}"</p>
@@ -223,6 +223,20 @@ export default function AdminPanel({ suggestions, counselors, packingStates, def
                           <span>📅 תאריך: {new Date(s.created_at || Date.now()).toLocaleString("he-IL")}</span>
                         </div>
                       </div>
+                      <button
+                        onClick={() => onDeleteSuggestion(s.id)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--red-warning)',
+                          cursor: 'pointer',
+                          fontSize: '0.85rem',
+                          fontWeight: 'bold',
+                          padding: '0.5rem'
+                        }}
+                      >
+                        🗑️ מחק
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -252,6 +266,7 @@ export default function AdminPanel({ suggestions, counselors, packingStates, def
                       <th style={{ padding: '1rem' }}>אימייל</th>
                       <th style={{ padding: '1rem' }}>תפקיד במחנה</th>
                       <th style={{ padding: '1rem', textAlign: 'center' }}>אחוז אריזה</th>
+                      <th style={{ padding: '1rem', textAlign: 'center' }}>פעולות</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -295,6 +310,25 @@ export default function AdminPanel({ suggestions, counselors, packingStates, def
                               </div>
                               <span style={{ fontWeight: 'bold', minWidth: '35px' }}>{progress}%</span>
                             </div>
+                          </td>
+                          <td style={{ padding: '1rem', textAlign: 'center' }}>
+                            {c.email !== 'geleryehuda@gmail.com' ? (
+                              <button
+                                onClick={() => onDeleteUser(c.id)}
+                                style={{
+                                  background: 'none',
+                                  border: 'none',
+                                  color: 'var(--red-warning)',
+                                  cursor: 'pointer',
+                                  fontSize: '0.85rem',
+                                  fontWeight: 'bold'
+                                }}
+                              >
+                                🗑️ הסר משתמש
+                              </button>
+                            ) : (
+                              <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>מנהל</span>
+                            )}
                           </td>
                         </tr>
                       );
