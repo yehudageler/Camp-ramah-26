@@ -306,6 +306,7 @@ export default function App() {
       const updatedPhotos = dailyPhotos.filter(p => p.id !== photoId);
       setDailyPhotos(updatedPhotos);
       localStorage.setItem("ramah_daily_photos", JSON.stringify(updatedPhotos));
+    } 
   };
 
   const handleUpdatePhotoCaption = async (photoId, newCaption) => {
