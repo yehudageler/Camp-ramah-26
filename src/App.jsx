@@ -306,6 +306,24 @@ export default function App() {
       const updatedPhotos = dailyPhotos.filter(p => p.id !== photoId);
       setDailyPhotos(updatedPhotos);
       localStorage.setItem("ramah_daily_photos", JSON.stringify(updatedPhotos));
+  };
+
+  const handleUpdatePhotoCaption = async (photoId, newCaption) => {
+    if (isSupabaseActive) {
+      try {
+        const { error } = await supabase
+          .from("daily_photos")
+          .update({ caption: newCaption })
+          .eq("id", photoId);
+        if (error) throw error;
+        setDailyPhotos(prev => prev.map(p => p.id === photoId ? { ...p, caption: newCaption } : p));
+      } catch (err) {
+        console.error("Error updating daily photo caption:", err);
+      }
+    } else {
+      const updatedPhotos = dailyPhotos.map(p => p.id === photoId ? { ...p, caption: newCaption } : p);
+      setDailyPhotos(updatedPhotos);
+      localStorage.setItem("ramah_daily_photos", JSON.stringify(updatedPhotos));
     }
   };
 
@@ -607,6 +625,7 @@ export default function App() {
             dailyPhotos={dailyPhotos}
             onUploadPhoto={handleUploadPhoto}
             onDeletePhoto={handleDeletePhoto}
+            onUpdatePhotoCaption={handleUpdatePhotoCaption}
             onSubmitSuggestion={handleSubmitSuggestion}
           />
         </main>

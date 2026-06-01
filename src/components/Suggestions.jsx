@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { processImage } from '../lib/imageUtils';
 
 export default function Suggestions({ 
@@ -6,6 +6,7 @@ export default function Suggestions({
   dailyPhotos = [], 
   onUploadPhoto, 
   onDeletePhoto, 
+  onUpdatePhotoCaption,
   onSubmitSuggestion 
 }) {
   const [feedback, setFeedback] = useState("");
@@ -17,6 +18,23 @@ export default function Suggestions({
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [uploading, setUploading] = useState(false);
+
+  const [isEditingCaption, setIsEditingCaption] = useState(false);
+  const [editedCaption, setEditedCaption] = useState("");
+
+  useEffect(() => {
+    setIsEditingCaption(false);
+    setEditedCaption(dailyPhotos[currentIndex]?.caption || "");
+  }, [currentIndex, dailyPhotos]);
+
+  const handleSaveCaption = async (e) => {
+    e.preventDefault();
+    const currentPhoto = dailyPhotos[currentIndex];
+    if (currentPhoto && onUpdatePhotoCaption) {
+      await onUpdatePhotoCaption(currentPhoto.id, editedCaption.trim());
+      setIsEditingCaption(false);
+    }
+  };
 
   // 1. Submit suggestion
   const handleSubmit = (e) => {
@@ -123,15 +141,11 @@ export default function Suggestions({
               {/* Image Frame */}
               <div style={{
                 position: 'relative',
-                borderRadius: 'var(--radius-md)',
-                overflow: 'hidden',
-                backgroundColor: '#1a202c',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: 'inset 0 0 10px rgba(0,0,0,0.5)',
                 width: '100%',
-                maxHeight: '480px'
+                backgroundColor: 'transparent'
               }}>
                 <img 
                   src={dailyPhotos[currentIndex].image_data} 
@@ -142,7 +156,10 @@ export default function Suggestions({
                     width: 'auto',
                     height: 'auto',
                     objectFit: 'contain',
-                    display: 'block'
+                    display: 'block',
+                    borderRadius: 'var(--radius-md)',
+                    boxShadow: '0 8px 24px rgba(30, 70, 32, 0.08)',
+                    border: '2px solid var(--forest-green-light)'
                   }}
                 />
               </div>
@@ -155,9 +172,49 @@ export default function Suggestions({
                 borderRadius: 'var(--radius-sm)',
                 borderRight: '4px solid var(--campfire-amber)'
               }}>
-                <p style={{ fontWeight: '600', fontSize: '0.95rem', margin: 0 }}>
-                  {dailyPhotos[currentIndex].caption || "ללא כיתוב"}
-                </p>
+                {isEditingCaption ? (
+                  <form onSubmit={handleSaveCaption} style={{ display: 'flex', gap: '0.5rem', width: '100%', alignItems: 'center', marginBottom: '0.5rem' }}>
+                    <input 
+                      type="text" 
+                      value={editedCaption} 
+                      onChange={(e) => setEditedCaption(e.target.value)} 
+                      className="add-item-input"
+                      style={{ padding: '0.3rem 0.6rem', fontSize: '0.95rem', margin: 0, height: 'auto' }}
+                      placeholder="הוסיפו כיתוב לתמונה..."
+                      autoFocus
+                    />
+                    <button type="submit" className="tab-btn" style={{ padding: '0.4rem 0.8rem', backgroundColor: 'var(--forest-green)', color: '#fff', fontSize: '0.85rem' }}>שמור ✔</button>
+                    <button type="button" className="tab-btn" onClick={() => setIsEditingCaption(false)} style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>ביטול</button>
+                  </form>
+                ) : (
+                  <>
+                    {dailyPhotos[currentIndex].caption ? (
+                      <p style={{ fontWeight: '600', fontSize: '0.95rem', margin: '0 0 0.3rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        <span>{dailyPhotos[currentIndex].caption}</span>
+                        {isAdmin && (
+                          <span 
+                            onClick={() => { setIsEditingCaption(true); setEditedCaption(dailyPhotos[currentIndex].caption || ""); }} 
+                            style={{ cursor: 'pointer', fontSize: '0.9rem', opacity: 0.7 }} 
+                            title="ערוך כיתוב"
+                          >
+                            ✏️
+                          </span>
+                        )}
+                      </p>
+                    ) : (
+                      isAdmin && (
+                        <div style={{ marginBottom: '0.5rem' }}>
+                          <span 
+                            onClick={() => { setIsEditingCaption(true); setEditedCaption(""); }} 
+                            style={{ cursor: 'pointer', color: 'var(--campfire-amber)', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.9rem' }}
+                          >
+                            ✏️ הוספת כיתוב לתמונה
+                          </span>
+                        </div>
+                      )
+                    )}
+                  </>
+                )}
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                   📅 הועלה ב- {new Date(dailyPhotos[currentIndex].created_at).toLocaleDateString("he-IL")}
                 </span>
@@ -265,8 +322,31 @@ export default function Suggestions({
               </div>
 
               {previewUrl && (
-                <div style={{ position: 'relative', width: '100px', aspectRatio: '16/9', borderRadius: '4px', overflow: 'hidden', border: '1px solid #cbd5e1' }}>
-                  <img src={previewUrl} alt="תצוגה מקדימה" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div style={{ 
+                  position: 'relative', 
+                  width: '120px', 
+                  maxHeight: '120px', 
+                  borderRadius: '8px', 
+                  overflow: 'hidden', 
+                  border: '1px solid var(--forest-green-light)',
+                  backgroundColor: '#1a202c',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: '0.5rem'
+                }}>
+                  <img 
+                    src={previewUrl} 
+                    alt="תצוגה מקדימה" 
+                    style={{ 
+                      maxWidth: '100%', 
+                      maxHeight: '120px', 
+                      width: 'auto',
+                      height: 'auto',
+                      objectFit: 'contain',
+                      display: 'block'
+                    }} 
+                  />
                 </div>
               )}
 
