@@ -9,6 +9,8 @@ import { processImage } from './lib/imageUtils';
 import { defaultPackingList } from './constants/packingList';
 import Suggestions from './components/Suggestions';
 import AdminPanel from './components/AdminPanel';
+import ConfessionsCorner from './components/ConfessionsCorner';
+import BirthdaysCorner from './components/BirthdaysCorner';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -92,7 +94,8 @@ export default function App() {
             email: session.user.email,
             name: profile?.full_name || session.user.email,
             role: profile?.role || "שליח/ה",
-            avatar: profile?.avatar || "campfire"
+            avatar: profile?.avatar || "campfire",
+            birthday: profile?.birthday
           };
           setCurrentUser(user);
           await syncData(user);
@@ -620,6 +623,8 @@ export default function App() {
           />
 
           <LayaTip />
+
+          {/* <ConfessionsCorner currentUser={currentUser} /> */}
 
           <Suggestions 
             isAdmin={currentUser.email === 'geleryehuda@gmail.com'}

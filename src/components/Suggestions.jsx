@@ -112,7 +112,17 @@ export default function Suggestions({
     <section className="suggestions-section">
       
       {/* 📸 DAILY PHOTO GALLERY CARD */}
-      <div className="info-card" style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
+      <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          minHeight: '400px',
+          background: 'var(--white-card)',
+          borderRadius: 'var(--radius-lg)',
+          padding: '2.5rem',
+          boxShadow: 'var(--shadow-soft)',
+          marginBottom: '2.5rem',
+          border: '1.5px solid rgba(2, 136, 209, 0.18)'
+        }}>
         <h3 style={{ color: 'var(--forest-green)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <span>📸</span> פינת התמונה היומית
         </h3>
@@ -145,8 +155,17 @@ export default function Suggestions({
                 alignItems: 'center',
                 justifyContent: 'center',
                 width: '100%',
-                backgroundColor: 'transparent'
-              }}>
+                backgroundColor: '#fff',
+                padding: '1rem',
+                border: '1px solid #e2e8f0',
+                borderRadius: 'var(--radius-md)',
+                boxShadow: 'var(--shadow-soft)',
+                transition: 'transform 0.2s ease-in-out',
+                zIndex: 10
+              }}
+              onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.01)'}
+              onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              >
                 <img 
                   src={dailyPhotos[currentIndex].image_data} 
                   alt={dailyPhotos[currentIndex].caption || "תמונה יומית"} 
@@ -164,119 +183,167 @@ export default function Suggestions({
                 />
               </div>
 
-              {/* Caption & Date Overlay */}
+              {/* Caption & Date & Controls Card */}
               <div style={{
-                marginTop: '0.8rem',
+                marginTop: '1.5rem',
                 backgroundColor: 'var(--white-card)',
-                padding: '0.8rem',
-                borderRadius: 'var(--radius-sm)',
-                borderRight: '4px solid var(--campfire-amber)'
+                padding: '1.2rem',
+                borderRadius: 'var(--radius-md)',
+                boxShadow: 'var(--shadow-soft)',
+                border: '1.5px solid rgba(30, 70, 32, 0.15)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.8rem',
+                position: 'relative',
+                zIndex: 11
               }}>
+                {/* Top row: Date and Delete button */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #edf2f7', paddingBottom: '0.8rem' }}>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    📅 <span style={{ fontWeight: '500' }}>הועלה ב- {new Date(dailyPhotos[currentIndex].created_at).toLocaleDateString("he-IL")}</span>
+                  </span>
+                  {isAdmin && (
+                    <button 
+                      onClick={handleDeleteCurrent}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--red-warning)',
+                        cursor: 'pointer',
+                        fontSize: '0.85rem',
+                        fontWeight: 'bold',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.3rem',
+                        padding: '0.3rem 0.6rem',
+                        borderRadius: 'var(--radius-sm)',
+                        transition: 'var(--transition)'
+                      }}
+                      onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--red-light)'}
+                      onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      🗑️ מחיקה
+                    </button>
+                  )}
+                </div>
+
+                {/* Caption area */}
+                <div>
                 {isEditingCaption ? (
-                  <form onSubmit={handleSaveCaption} style={{ display: 'flex', gap: '0.5rem', width: '100%', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <form onSubmit={handleSaveCaption} style={{ display: 'flex', gap: '0.5rem', width: '100%', alignItems: 'center' }}>
                     <input 
                       type="text" 
                       value={editedCaption} 
                       onChange={(e) => setEditedCaption(e.target.value)} 
                       className="add-item-input"
-                      style={{ padding: '0.3rem 0.6rem', fontSize: '0.95rem', margin: 0, height: 'auto' }}
+                      style={{ flexGrow: 1, padding: '0.6rem 0.8rem', fontSize: '1rem', margin: 0, borderRadius: 'var(--radius-sm)', border: '2px solid var(--forest-green-light)' }}
                       placeholder="הוסיפו כיתוב לתמונה..."
                       autoFocus
                     />
-                    <button type="submit" className="tab-btn" style={{ padding: '0.4rem 0.8rem', backgroundColor: 'var(--forest-green)', color: '#fff', fontSize: '0.85rem' }}>שמור ✔</button>
-                    <button type="button" className="tab-btn" onClick={() => setIsEditingCaption(false)} style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>ביטול</button>
+                    <button type="submit" style={{ padding: '0.6rem 1rem', backgroundColor: 'var(--forest-green)', color: '#fff', fontSize: '0.9rem', borderRadius: 'var(--radius-sm)', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>שמור</button>
+                    <button type="button" onClick={() => setIsEditingCaption(false)} style={{ padding: '0.6rem 1rem', fontSize: '0.9rem', borderRadius: 'var(--radius-sm)', border: '1px solid #cbd5e1', backgroundColor: 'transparent', cursor: 'pointer' }}>ביטול</button>
                   </form>
                 ) : (
                   <>
                     {dailyPhotos[currentIndex].caption ? (
-                      <p style={{ fontWeight: '600', fontSize: '0.95rem', margin: '0 0 0.3rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                        <span>{dailyPhotos[currentIndex].caption}</span>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
+                        <p style={{ fontWeight: '600', fontSize: '1.1rem', margin: 0, color: 'var(--text-main)', lineHeight: '1.4' }}>
+                          {dailyPhotos[currentIndex].caption}
+                        </p>
                         {isAdmin && (
-                          <span 
+                          <button 
                             onClick={() => { setIsEditingCaption(true); setEditedCaption(dailyPhotos[currentIndex].caption || ""); }} 
-                            style={{ cursor: 'pointer', fontSize: '0.9rem', opacity: 0.7 }} 
+                            style={{ background: 'var(--forest-green-light)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, transition: 'var(--transition)' }} 
                             title="ערוך כיתוב"
                           >
                             ✏️
-                          </span>
+                          </button>
                         )}
-                      </p>
+                      </div>
                     ) : (
                       isAdmin && (
-                        <div style={{ marginBottom: '0.5rem' }}>
-                          <span 
+                        <div>
+                          <button 
                             onClick={() => { setIsEditingCaption(true); setEditedCaption(""); }} 
-                            style={{ cursor: 'pointer', color: 'var(--campfire-amber)', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.9rem' }}
+                            style={{ background: 'transparent', border: '2px dashed var(--campfire-amber)', color: 'var(--campfire-amber)', padding: '0.6rem 1rem', borderRadius: 'var(--radius-sm)', cursor: 'pointer', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.95rem', width: '100%', justifyContent: 'center', transition: 'var(--transition)' }}
+                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--campfire-light)'}
+                            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                           >
                             ✏️ הוספת כיתוב לתמונה
-                          </span>
+                          </button>
                         </div>
                       )
                     )}
                   </>
                 )}
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  📅 הועלה ב- {new Date(dailyPhotos[currentIndex].created_at).toLocaleDateString("he-IL")}
-                </span>
-              </div>
+                </div>
 
-              {/* Carousel controls */}
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginTop: '1rem',
-                gap: '1rem'
-              }}>
-                <button 
-                  onClick={handlePrevPhoto} 
-                  disabled={currentIndex === dailyPhotos.length - 1}
-                  className="tab-btn"
-                  style={{
-                    padding: '0.4rem 1rem',
-                    opacity: currentIndex === dailyPhotos.length - 1 ? 0.5 : 1,
-                    cursor: currentIndex === dailyPhotos.length - 1 ? 'not-allowed' : 'pointer'
-                  }}
-                >
-                  → קודמת (ישנה יותר)
-                </button>
-                
-                <span style={{ fontWeight: 'bold', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-                  {currentIndex + 1} / {dailyPhotos.length}
-                </span>
-
-                <button 
-                  onClick={handleNextPhoto} 
-                  disabled={currentIndex === 0}
-                  className="tab-btn"
-                  style={{
-                    padding: '0.4rem 1rem',
-                    opacity: currentIndex === 0 ? 0.5 : 1,
-                    cursor: currentIndex === 0 ? 'not-allowed' : 'pointer'
-                  }}
-                >
-                  הבאה (חדשה יותר) ←
-                </button>
-              </div>
-
-              {/* Delete Button (Admin Only) */}
-              {isAdmin && (
-                <div style={{ textAlign: 'center', marginTop: '0.8rem' }}>
+                {/* Carousel controls */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '0.5rem',
+                  paddingTop: '0.8rem',
+                  borderTop: '1px dashed #edf2f7'
+                }}>
                   <button 
-                    onClick={handleDeleteCurrent}
+                    onClick={handlePrevPhoto} 
+                    disabled={currentIndex === dailyPhotos.length - 1}
                     style={{
-                      background: 'none',
+                      background: 'var(--forest-green-light)',
+                      color: 'var(--forest-green)',
                       border: 'none',
-                      color: 'var(--red-warning)',
-                      cursor: 'pointer',
-                      fontSize: '0.85rem',
-                      fontWeight: 'bold'
+                      borderRadius: '20px',
+                      padding: '0.5rem 1rem',
+                      fontWeight: 'bold',
+                      fontSize: '0.9rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                      opacity: currentIndex === dailyPhotos.length - 1 ? 0.4 : 1,
+                      cursor: currentIndex === dailyPhotos.length - 1 ? 'not-allowed' : 'pointer',
+                      transition: 'var(--transition)'
                     }}
                   >
-                    🗑️ מחק תמונה זו
+                    <span style={{ fontSize: '1.2rem', lineHeight: 1 }}>→</span> ישנות
+                  </button>
+                  
+                  <div style={{ 
+                    background: '#f8fafc', 
+                    padding: '0.3rem 0.8rem', 
+                    borderRadius: '20px',
+                    fontWeight: 'bold', 
+                    fontSize: '0.85rem', 
+                    color: 'var(--text-muted)',
+                    border: '1px solid #edf2f7'
+                  }}>
+                    {currentIndex + 1} / {dailyPhotos.length}
+                  </div>
+
+                  <button 
+                    onClick={handleNextPhoto} 
+                    disabled={currentIndex === 0}
+                    style={{
+                      background: 'var(--forest-green-light)',
+                      color: 'var(--forest-green)',
+                      border: 'none',
+                      borderRadius: '20px',
+                      padding: '0.5rem 1rem',
+                      fontWeight: 'bold',
+                      fontSize: '0.9rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                      opacity: currentIndex === 0 ? 0.4 : 1,
+                      cursor: currentIndex === 0 ? 'not-allowed' : 'pointer',
+                      transition: 'var(--transition)'
+                    }}
+                  >
+                    חדשות <span style={{ fontSize: '1.2rem', lineHeight: 1 }}>←</span>
                   </button>
                 </div>
-              )}
+              </div>
 
             </div>
           )}
@@ -373,7 +440,14 @@ export default function Suggestions({
       </div>
 
       {/* 💡 WARM SUGGESTIONS CARD */}
-      <div className="feedback-card">
+      <div style={{ 
+          background: 'var(--white-card)',
+          borderRadius: 'var(--radius-lg)',
+          padding: '2.5rem',
+          boxShadow: 'var(--shadow-soft)',
+          marginBottom: '2.5rem',
+          border: '1.5px solid rgba(30, 70, 32, 0.15)'
+        }}>
         <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <span>💡</span> בואו נבנה את זה ביחד!
         </h3>

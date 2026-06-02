@@ -16,12 +16,15 @@
   --text-muted: #526058;
   --red-warning: #c62828;
   --red-light: #ffebee;
-  --radius-lg: 24px;
-  --radius-md: 16px;
-  --radius-sm: 10px;
-  --shadow-soft: 0 10px 30px rgba(30, 70, 32, 0.05);
-  --shadow-md: 0 15px 35px rgba(30, 70, 32, 0.08);
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --shadow-soft: 0 4px 20px rgba(30, 70, 32, 0.04);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.06);
+  --shadow-block: 0 8px 30px rgba(30, 70, 32, 0.04);
+  --shadow-block-amber: 0 8px 30px rgba(230, 81, 0, 0.04);
+  --shadow-block-blue: 0 8px 30px rgba(2, 136, 209, 0.04);
+  --transition: all 0.2s ease-in-out;
 }
 
 * {
@@ -114,7 +117,7 @@ h1, h2, h3, h4, .font-heading {
   padding: 3rem 2.5rem;
   width: 100%;
   max-width: 520px;
-  border: 2px solid var(--forest-green-light);
+  border: 1.5px solid rgba(30, 70, 32, 0.15);
   position: relative;
   overflow: hidden;
   transition: var(--transition);
@@ -227,7 +230,7 @@ h1, h2, h3, h4, .font-heading {
   font-weight: 700;
   cursor: pointer;
   transition: var(--transition);
-  box-shadow: 0 4px 6px rgba(30, 70, 32, 0.15);
+  box-shadow: 0 4px 12px rgba(30, 70, 32, 0.15);
   font-family: 'Fredoka', sans-serif;
   margin-top: 1rem;
 }
@@ -235,7 +238,7 @@ h1, h2, h3, h4, .font-heading {
 .btn-primary:hover {
   background: var(--forest-green-hover);
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(30, 70, 32, 0.2);
+  box-shadow: 0 6px 16px rgba(30, 70, 32, 0.2);
 }
 
 /* ==========================================
@@ -250,7 +253,7 @@ h1, h2, h3, h4, .font-heading {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
   margin-bottom: 2rem;
-  border: 1px solid var(--forest-green-light);
+  border: 1.5px solid rgba(30, 70, 32, 0.15);
 }
 
 .user-profile-widget {
@@ -315,6 +318,7 @@ h1, h2, h3, h4, .font-heading {
   padding: 2.5rem 2rem;
   text-align: center;
   box-shadow: var(--shadow-md);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
   position: relative;
   overflow: hidden;
   margin-bottom: 2.5rem;
@@ -441,7 +445,7 @@ h1, h2, h3, h4, .font-heading {
   padding: 2rem;
   box-shadow: var(--shadow-soft);
   margin-bottom: 2.5rem;
-  border: 1px solid var(--forest-green-light);
+  border: 1.5px solid rgba(230, 81, 0, 0.18);
 }
 
 .section-header {
@@ -523,8 +527,8 @@ h1, h2, h3, h4, .font-heading {
   backface-visibility: hidden;
   border-radius: var(--radius-md);
   padding: 1.5rem;
-  border: 2px solid var(--forest-green-light);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+  border: 1.5px solid rgba(30, 70, 32, 0.15);
+  box-shadow: var(--shadow-soft);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -609,7 +613,7 @@ h1, h2, h3, h4, .font-heading {
   padding: 2.5rem;
   box-shadow: var(--shadow-soft);
   margin-bottom: 2.5rem;
-  border: 1px solid var(--forest-green-light);
+  border: 1.5px solid rgba(2, 136, 209, 0.18);
 }
 
 /* Top tip box matching the screenshot style */
@@ -1020,4 +1024,52 @@ h1, h2, h3, h4, .font-heading {
   opacity: 1;
   color: var(--red-warning);
   background-color: var(--red-light);
+}
+
+/* ==========================================
+   MODERN DATE PICKER STYLE
+   ========================================== */
+.date-input-wrapper {
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.date-picker-input {
+  padding-right: 2.8rem !important;
+  cursor: pointer;
+  position: relative;
+}
+
+/* Hide default browser date picker icon but keep it fully clickable */
+.date-picker-input::-webkit-calendar-picker-indicator {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: auto;
+  height: auto;
+  background: transparent;
+  color: transparent;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.date-input-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--forest-green);
+  pointer-events: none;
+  transition: var(--transition);
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+}
+
+.date-picker-input:focus + .date-input-icon {
+  color: var(--campfire-amber);
 }

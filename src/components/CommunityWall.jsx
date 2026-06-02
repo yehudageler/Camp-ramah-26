@@ -1,10 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CounselorCard from './CounselorCard';
 
 const mockCounselors = [];
 
 export default function CommunityWall({ currentUser, databaseProfiles, packingProgress }) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [shuffledIds, setShuffledIds] = useState([]);
+
+  useEffect(() => {
+    if (databaseProfiles && databaseProfiles.length > 0) {
+      const ids = databaseProfiles.map(p => p.id);
+      // Fisher-Yates shuffle
+      for (let i = ids.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [ids[i], ids[j]] = [ids[j], ids[i]];
+      }
+      setShuffledIds(ids);
+    }
+  }, [databaseProfiles]);
 
   const allCounselors = [];
 
@@ -54,6 +67,18 @@ export default function CommunityWall({ currentUser, databaseProfiles, packingPr
       uniqueCounselors.push(c);
     }
   });
+
+  // Sort by the shuffled order if available
+  if (shuffledIds.length > 0) {
+    uniqueCounselors.sort((a, b) => {
+      const indexA = shuffledIds.indexOf(a.id);
+      const indexB = shuffledIds.indexOf(b.id);
+      if (indexA === -1 && indexB === -1) return 0;
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      return indexA - indexB;
+    });
+  }
 
   // Filter based on search query
   const filteredCounselors = uniqueCounselors.filter(c => {

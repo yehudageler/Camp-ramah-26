@@ -4,11 +4,12 @@ export default function LayaTip() {
       className="info-card"
       style={{
         marginTop: '2rem',
+        marginBottom: '2.5rem',
         padding: '1.5rem',
         backgroundColor: 'var(--white-card)',
         borderRadius: 'var(--radius-md)',
-        border: '1px solid var(--forest-green-light)',
-        boxShadow: 'var(--shadow-sm)',
+        border: '1.5px solid rgba(30, 70, 32, 0.15)',
+        boxShadow: 'var(--shadow-soft)',
         display: 'flex',
         gap: '1.5rem',
         alignItems: 'center',

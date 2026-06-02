@@ -62,6 +62,7 @@ export default function AuthScreen({ onAuthSuccess }) {
   const [role, setRole] = useState("");
   const [avatar, setAvatar] = useState("");
   const [avatarFile, setAvatarFile] = useState(null);
+  const [birthday, setBirthday] = useState("");
   
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -122,7 +123,8 @@ export default function AuthScreen({ onAuthSuccess }) {
                 full_name: name,
                 email: email,
                 role: role,
-                avatar: avatarUrl
+                avatar: avatarUrl,
+                birthday: birthday || null
               });
               
             if (profileError) throw profileError;
@@ -134,7 +136,8 @@ export default function AuthScreen({ onAuthSuccess }) {
               email: email,
               name: name,
               role: role,
-              avatar: avatarUrl
+              avatar: avatarUrl,
+              birthday: birthday
             };
             
             onAuthSuccess(user);
@@ -163,7 +166,8 @@ export default function AuthScreen({ onAuthSuccess }) {
               email: signInData.user.email,
               name: profile?.full_name || signInData.user.email,
               role: profile?.role || "שליח/ה",
-              avatar: profile?.avatar || "campfire"
+              avatar: profile?.avatar || "campfire",
+              birthday: profile?.birthday
             };
             
             setSuccessMsg("התחברתם בהצלחה!");
@@ -177,7 +181,8 @@ export default function AuthScreen({ onAuthSuccess }) {
             name,
             email,
             role,
-            avatar
+            avatar,
+            birthday
           };
           localStorage.setItem("ramah_user", JSON.stringify(user));
           onAuthSuccess(user);
@@ -306,6 +311,38 @@ export default function AuthScreen({ onAuthSuccess }) {
                   onChange={(e) => setRole(e.target.value)}
                   required
                 />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label" htmlFor="reg-birthday">תאריך יום הולדת 🎂</label>
+                <div className="date-input-wrapper">
+                  <input 
+                    type="date" 
+                    id="reg-birthday" 
+                    className="form-input date-picker-input" 
+                    value={birthday}
+                    onChange={(e) => setBirthday(e.target.value)}
+                    required
+                  />
+                  <svg 
+                    className="date-input-icon"
+                    xmlns="http://www.w3.org/2000/svg" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                  >
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </div>
+                <small style={{ display: 'block', marginTop: '0.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                  מלאו את יום ההולדת כדי שנוכל לחגוג לכם בפינת ימי הולדת השבוע! 🎉
+                </small>
               </div>
 
               <div className="form-group">
