@@ -11,6 +11,7 @@ import Suggestions from './components/Suggestions';
 import AdminPanel from './components/AdminPanel';
 import ConfessionsCorner from './components/ConfessionsCorner';
 import BirthdaysCorner from './components/BirthdaysCorner';
+import ProfileEditModal from './components/ProfileEditModal';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -22,6 +23,7 @@ export default function App() {
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [packingStates, setPackingStates] = useState([]);
   const [dailyPhotos, setDailyPhotos] = useState([]);
+  const [showProfileEdit, setShowProfileEdit] = useState(false);
 
   const syncData = async (user) => {
     try {
@@ -358,6 +360,100 @@ export default function App() {
     }
   };
 
+  const handleSaveProfile = async ({ name, role, birthday, avatar, avatarFile }) => {
+    if (!currentUser) return;
+    
+    let finalAvatarUrl = avatar;
+    
+    // If a new personal photo was uploaded, process and upload it to Supabase storage
+    if (avatarFile) {
+      if (isSupabaseActive) {
+        try {
+          const fileExt = avatarFile.name.split('.').pop() || 'jpg';
+          const fileName = `${currentUser.id}-${Date.now()}.${fileExt}`;
+          
+          // 1. Upload new photo file
+          const { error: uploadError } = await supabase.storage
+            .from('avatars')
+            .upload(fileName, avatarFile);
+            
+          if (uploadError) throw uploadError;
+          
+          // 2. Retrieve public URL
+          const { data: publicUrlData } = supabase.storage
+            .from('avatars')
+            .getPublicUrl(fileName);
+          
+          finalAvatarUrl = publicUrlData.publicUrl;
+          
+          // 3. Delete old custom avatar from storage if applicable
+          const oldAvatar = currentUser.avatar;
+          if (oldAvatar && oldAvatar.includes('/public/avatars/')) {
+            const parts = oldAvatar.split('/public/avatars/');
+            if (parts.length > 1) {
+              const oldFileName = parts[1];
+              await supabase.storage.from('avatars').remove([oldFileName]);
+            }
+          }
+        } catch (err) {
+          console.error("Failed to upload avatar:", err);
+          alert("שגיאה בהעלאת התמונה: " + err.message);
+          return;
+        }
+      } else {
+        // Local mode base64 representation
+        finalAvatarUrl = avatar;
+      }
+    }
+
+    const updatedUser = {
+      ...currentUser,
+      name,
+      role,
+      birthday,
+      avatar: finalAvatarUrl
+    };
+
+    if (isSupabaseActive) {
+      try {
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .update({
+            full_name: name,
+            role: role,
+            birthday: birthday || null,
+            avatar: finalAvatarUrl
+          })
+          .eq("id", currentUser.id);
+
+        if (profileError) throw profileError;
+
+        setCurrentUser(updatedUser);
+        
+        // Instantly sync the community wall and birthdays in state
+        setDatabaseProfiles(prev => prev.map(p => 
+          p.id === currentUser.id 
+            ? { ...p, full_name: name, role: role, birthday: birthday || null, avatar: finalAvatarUrl } 
+            : p
+        ));
+      } catch (err) {
+        console.error("Failed to update profile:", err);
+        alert("שגיאה בעדכון הפרופיל: " + err.message);
+        return;
+      }
+    } else {
+      setCurrentUser(updatedUser);
+      localStorage.setItem("ramah_user", JSON.stringify(updatedUser));
+      setDatabaseProfiles(prev => prev.map(p => 
+        p.id === currentUser.id 
+          ? { ...p, full_name: name, role: role, birthday: birthday || null, avatar: finalAvatarUrl } 
+          : p
+      ));
+    }
+
+    setShowProfileEdit(false);
+  };
+
   const handleUpdateAvatar = async (fileObj) => {
     if (!currentUser) return;
     
@@ -521,61 +617,27 @@ export default function App() {
         <main>
           {/* Top Navigation & User profile widget */}
           <header className="dashboard-header">
-            <div className="user-profile-widget">
+            <div 
+              className="user-profile-widget"
+              onClick={() => setShowProfileEdit(true)}
+              style={{ cursor: 'pointer' }}
+              title="לחצו לעריכת פרטי הפרופיל ⚙️"
+            >
               <div 
                 id="user-avatar-container"
                 style={{
                   position: 'relative',
-                  cursor: 'pointer',
                   borderRadius: '50%',
                   overflow: 'hidden',
                   width: '60px',
-                  height: '60px'
+                  height: '60px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#f8fafc'
                 }}
-                title="לחצו לעדכון תמונת הפרופיל 📸"
               >
                 <AvatarSVG avatarType={currentUser.avatar} size={60} />
-                <label 
-                  htmlFor="header-avatar-upload"
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: 'rgba(0, 0, 0, 0.4)',
-                    color: '#fff',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    opacity: 0,
-                    transition: 'opacity 0.2s',
-                    cursor: 'pointer',
-                    fontSize: '1.1rem',
-                    borderRadius: '50%',
-                    margin: 0
-                  }}
-                  className="avatar-hover-overlay"
-                >
-                  📸
-                </label>
-                <input 
-                  type="file"
-                  accept="image/*"
-                  id="header-avatar-upload"
-                  style={{ display: 'none' }}
-                  onChange={async (e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      try {
-                        const processed = await processImage(file, { forceSquare: true, targetSize: 300 });
-                        await handleUpdateAvatar(processed.file);
-                      } catch (err) {
-                        alert(err.message || "שגיאה בעיבוד התמונה");
-                      }
-                    }
-                  }}
-                />
               </div>
               <div className="user-info-text">
                 <div className="user-name" id="display-name">{currentUser.name}</div>
@@ -646,6 +708,14 @@ export default function App() {
           onDeleteUser={handleDeleteUser}
           onDeleteSuggestion={handleDeleteSuggestion}
           onClose={() => setShowAdminPanel(false)}
+        />
+      )}
+
+      {showProfileEdit && (
+        <ProfileEditModal 
+          currentUser={currentUser} 
+          onClose={() => setShowProfileEdit(false)} 
+          onSave={handleSaveProfile} 
         />
       )}
     </div>
