@@ -12,6 +12,8 @@ import AdminPanel from './components/AdminPanel';
 import ConfessionsCorner from './components/ConfessionsCorner';
 import BirthdaysCorner from './components/BirthdaysCorner';
 import ProfileEditModal from './components/ProfileEditModal';
+import NavigationBar from './components/NavigationBar';
+import CampNewspaper from './components/CampNewspaper';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -24,6 +26,7 @@ export default function App() {
   const [packingStates, setPackingStates] = useState([]);
   const [dailyPhotos, setDailyPhotos] = useState([]);
   const [showProfileEdit, setShowProfileEdit] = useState(false);
+  const [newspaperData, setNewspaperData] = useState(null);
 
   const syncData = async (user) => {
     try {
@@ -128,12 +131,22 @@ export default function App() {
         if (storedPhotos) {
           setDailyPhotos(JSON.parse(storedPhotos));
         }
+
+        const storedNewspaper = localStorage.getItem("ramah_newspaper");
+        if (storedNewspaper) {
+          setNewspaperData(JSON.parse(storedNewspaper));
+        }
       }
       setLoading(false);
     };
 
     initApp();
   }, []);
+
+  const handleUpdateNewspaper = (data) => {
+    setNewspaperData(data);
+    localStorage.setItem("ramah_newspaper", JSON.stringify(data));
+  };
 
   const handleAuthSuccess = async (user) => {
     setCurrentUser(user);
@@ -667,35 +680,56 @@ export default function App() {
             </div>
           </header>
 
-          <Countdown />
+          <NavigationBar />
 
-          <CommunityWall 
-            currentUser={currentUser}
-            databaseProfiles={databaseProfiles}
-            packingProgress={getProgressPercentage()}
-          />
+          <div id="home" className="hero-grid" style={{ scrollMarginTop: '60px' }}>
+            <Countdown />
+            <BirthdaysCorner databaseProfiles={databaseProfiles} currentUser={currentUser} />
+          </div>
 
-          <PackingList 
-            checkedStates={checkedStates}
-            customItems={customItems}
-            onToggleItem={handleToggleItem}
-            onDeleteItem={handleDeletePackingItem}
-            onAddItem={handleAddItem}
-            progressPercentage={getProgressPercentage()}
-          />
+          <div id="community" style={{ scrollMarginTop: '60px' }}>
+            <CommunityWall 
+              currentUser={currentUser}
+              databaseProfiles={databaseProfiles}
+              packingProgress={getProgressPercentage()}
+            />
+          </div>
 
-          <LayaTip />
+          <div id="packing" style={{ scrollMarginTop: '60px' }}>
+            <PackingList 
+              checkedStates={checkedStates}
+              customItems={customItems}
+              onToggleItem={handleToggleItem}
+              onDeleteItem={handleDeletePackingItem}
+              onAddItem={handleAddItem}
+              progressPercentage={getProgressPercentage()}
+            />
+          </div>
+
+          {/* <div id="newspaper" style={{ scrollMarginTop: '60px' }}>
+            <CampNewspaper 
+              isAdmin={currentUser.email === 'geleryehuda@gmail.com'}
+              newspaperData={newspaperData}
+              onUpdateNewspaper={handleUpdateNewspaper}
+            />
+          </div> */}
+
+          <div id="laya-tip" style={{ scrollMarginTop: '60px' }}>
+            <LayaTip />
+          </div>
 
           {/* <ConfessionsCorner currentUser={currentUser} /> */}
 
-          <Suggestions 
-            isAdmin={currentUser.email === 'geleryehuda@gmail.com'}
-            dailyPhotos={dailyPhotos}
-            onUploadPhoto={handleUploadPhoto}
-            onDeletePhoto={handleDeletePhoto}
-            onUpdatePhotoCaption={handleUpdatePhotoCaption}
-            onSubmitSuggestion={handleSubmitSuggestion}
-          />
+          <div id="gallery" style={{ scrollMarginTop: '60px' }}>
+            <Suggestions 
+              isAdmin={currentUser.email === 'geleryehuda@gmail.com'}
+              dailyPhotos={dailyPhotos}
+              onUploadPhoto={handleUploadPhoto}
+              onDeletePhoto={handleDeletePhoto}
+              onUpdatePhotoCaption={handleUpdatePhotoCaption}
+              onSubmitSuggestion={handleSubmitSuggestion}
+            />
+          </div>
         </main>
       )}
 

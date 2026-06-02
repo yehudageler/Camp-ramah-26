@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { supabase, isSupabaseActive } from '../lib/supabase';
 import { processImage } from '../lib/imageUtils';
 
-export function AvatarSVG({ avatarType, size = 60 }) {
+export function AvatarSVG({ avatarType, size = 60, border = '3px solid var(--forest-green)' }) {
   if (avatarType && (avatarType.startsWith('data:image/') || avatarType.startsWith('http'))) {
     return (
       <img 
@@ -12,7 +12,7 @@ export function AvatarSVG({ avatarType, size = 60 }) {
           width: size,
           height: size,
           borderRadius: '50%',
-          border: '3px solid var(--forest-green)',
+          border: border,
           objectFit: 'cover',
           display: 'block'
         }}
@@ -44,7 +44,7 @@ export function AvatarSVG({ avatarType, size = 60 }) {
       height={size} 
       style={{
         borderRadius: '50%',
-        border: '3px solid var(--forest-green)',
+        border: border,
         background: bgColor,
         display: 'block'
       }}

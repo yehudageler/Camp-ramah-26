@@ -63,9 +63,9 @@ export default function PackingList({ checkedStates, customItems, onToggleItem, 
                 key={item.id}
                 className={`check-item ${isChecked ? 'checked' : ''} ${isWarning ? 'warning-item' : ''}`}
                 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}
+                onClick={() => !isWarning && onToggleItem(item.id)}
               >
                 <div
-                  onClick={() => !isWarning && onToggleItem(item.id)}
                   style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexGrow: 1 }}
                 >
                   <div className="custom-checkbox"></div>
