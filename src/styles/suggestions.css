@@ -56,8 +56,9 @@
   border-radius: var(--radius-lg);
   padding: 2.5rem;
   box-shadow: var(--shadow-soft);
-  margin-bottom: 2.5rem;
   border: 1.5px solid rgba(30, 70, 32, 0.15);
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .feedback-success {

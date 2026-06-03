@@ -9,8 +9,9 @@
   border-radius: var(--radius-lg);
   padding: 1.5rem;
   box-shadow: var(--shadow-soft);
-  margin-bottom: 1.5rem;
   border: 1.5px solid rgba(2, 136, 209, 0.18);
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .gallery-card h3 {

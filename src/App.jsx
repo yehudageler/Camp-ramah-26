@@ -719,7 +719,7 @@ export default function App() {
           {/* <ConfessionsCorner currentUser={currentUser} /> */}
 
           <section className="suggestions-section">
-            <div id="gallery" style={{ scrollMarginTop: '60px' }}>
+            <div id="gallery" style={{ scrollMarginTop: '60px', height: '100%' }}>
               <DailyPhoto 
                 isAdmin={currentUser.email === 'geleryehuda@gmail.com'}
                 dailyPhotos={dailyPhotos}
@@ -729,7 +729,7 @@ export default function App() {
               />
             </div>
 
-            <div id="suggestions" style={{ scrollMarginTop: '60px' }}>
+            <div id="suggestions" style={{ scrollMarginTop: '60px', height: '100%' }}>
               <Suggestions 
                 onSubmitSuggestion={handleSubmitSuggestion}
               />
