@@ -210,20 +210,18 @@ export default function DailyPhoto({
                     onClick={handlePrevPhoto}
                     disabled={currentIndex === dailyPhotos.length - 1}
                     className="gallery-nav-btn"
+                    title="תמונה קודמת"
                   >
-                    <span style={{ fontSize: '1.2rem', lineHeight: 1 }}>→</span> ישנות
+                    <span style={{ lineHeight: 1 }}>→</span>
                   </button>
-
-                  <div className="gallery-nav-count">
-                    תמונה {currentIndex + 1} מתוך {dailyPhotos.length}
-                  </div>
 
                   <button
                     onClick={handleNextPhoto}
                     disabled={currentIndex === 0}
                     className="gallery-nav-btn"
+                    title="תמונה הבאה"
                   >
-                    חדשות <span style={{ fontSize: '1.2rem', lineHeight: 1 }}>←</span>
+                    <span style={{ lineHeight: 1 }}>←</span>
                   </button>
                 </div>
               </div>

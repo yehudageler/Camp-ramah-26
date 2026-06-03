@@ -623,7 +623,7 @@ export default function App() {
   }
 
   return (
-    <div className="app-container">
+    <div id="home" className="app-container">
       {/* Supabase Status Banner (Shown if configuration is missing or inactive) */}
       {!isSupabaseActive && (
         <div id="db-status-banner" style={{ backgroundColor: 'var(--campfire-light)', border: '2px solid var(--campfire-amber)', padding: '1rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', textAlign: 'center', color: 'var(--campfire-amber)', fontWeight: 600 }}>
@@ -680,12 +680,20 @@ export default function App() {
 
           <NavigationBar />
 
-          <div id="home" className="hero-grid" style={{ scrollMarginTop: '60px' }}>
+          <div className="hero-grid">
             <Countdown />
-            <BirthdaysCorner databaseProfiles={databaseProfiles} currentUser={currentUser} />
+            <div id="gallery" style={{ height: '100%', scrollMarginTop: '15px' }}>
+              <DailyPhoto 
+                isAdmin={currentUser.email === 'geleryehuda@gmail.com'}
+                dailyPhotos={dailyPhotos}
+                onUploadPhoto={handleUploadPhoto}
+                onDeletePhoto={handleDeletePhoto}
+                onUpdatePhotoCaption={handleUpdatePhotoCaption}
+              />
+            </div>
           </div>
 
-          <div id="community" style={{ scrollMarginTop: '60px' }}>
+          <div id="community" style={{ scrollMarginTop: '15px' }}>
             <CommunityWall 
               currentUser={currentUser}
               databaseProfiles={databaseProfiles}
@@ -693,7 +701,7 @@ export default function App() {
             />
           </div>
 
-          <div id="packing" style={{ scrollMarginTop: '60px' }}>
+          <div id="packing" style={{ scrollMarginTop: '15px' }}>
             <PackingList 
               checkedStates={checkedStates}
               customItems={customItems}
@@ -712,24 +720,18 @@ export default function App() {
             />
           </div> */}
 
-          <div id="laya-tip" style={{ scrollMarginTop: '60px' }}>
+          <div id="laya-tip" style={{ scrollMarginTop: '15px' }}>
             <LayaTip />
           </div>
 
           {/* <ConfessionsCorner currentUser={currentUser} /> */}
 
-          <section className="suggestions-section">
-            <div id="gallery" style={{ scrollMarginTop: '60px', height: '100%' }}>
-              <DailyPhoto 
-                isAdmin={currentUser.email === 'geleryehuda@gmail.com'}
-                dailyPhotos={dailyPhotos}
-                onUploadPhoto={handleUploadPhoto}
-                onDeletePhoto={handleDeletePhoto}
-                onUpdatePhotoCaption={handleUpdatePhotoCaption}
-              />
+          <section className="suggestions-section" style={{ scrollMarginTop: '15px' }}>
+            <div id="birthdays" style={{ height: '100%' }}>
+              <BirthdaysCorner databaseProfiles={databaseProfiles} currentUser={currentUser} />
             </div>
 
-            <div id="suggestions" style={{ scrollMarginTop: '60px', height: '100%' }}>
+            <div id="suggestions" style={{ height: '100%', scrollMarginTop: '15px' }}>
               <Suggestions 
                 onSubmitSuggestion={handleSubmitSuggestion}
               />
