@@ -373,33 +373,64 @@ export default function Suggestions({
             style={{ position: 'absolute', right: '30px', zIndex: 10000, opacity: currentIndex === 0 ? 0.3 : 1 }}
           >›</button>
 
-          {/* Image Container */}
+          {/* Lightbox Content Wrapper */}
           <div
-            style={{ maxWidth: '90%', maxHeight: '70vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '90%',
+              maxWidth: '600px',
+              maxHeight: '82vh',
+              gap: '1rem',
+              boxSizing: 'border-box',
+              paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
+              zIndex: 9999
+            }}
             onClick={(e) => e.stopPropagation()}
           >
-            <img
-              src={dailyPhotos[currentIndex].image_data}
-              alt={dailyPhotos[currentIndex].caption || "תמונה יומית"}
-              style={{ maxWidth: '100%', maxHeight: '68vh', objectFit: 'contain', borderRadius: 'var(--radius-md)', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }}
-            />
-          </div>
+            {/* Image Container */}
+            <div
+              style={{
+                flex: '1 1 auto',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '100%',
+                minHeight: 0,
+                overflow: 'hidden'
+              }}
+            >
+              <img
+                src={dailyPhotos[currentIndex].image_data}
+                alt={dailyPhotos[currentIndex].caption || "תמונה יומית"}
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: '100%',
+                  objectFit: 'contain',
+                  borderRadius: 'var(--radius-md)',
+                  boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)'
+                }}
+              />
+            </div>
 
-          {/* Frosted Glass Caption */}
-          <div className="lightbox-caption-overlay" onClick={(e) => e.stopPropagation()}>
-            {dailyPhotos[currentIndex].caption ? (
-              <h4 className="lightbox-caption-title">
-                {dailyPhotos[currentIndex].caption}
-              </h4>
-            ) : (
-              <h4 className="lightbox-caption-title empty">
-                אין כיתוב לתמונה זו
-              </h4>
-            )}
-            <div className="lightbox-caption-meta">
-              <span>📅 הועלה ב-{new Date(dailyPhotos[currentIndex].created_at).toLocaleDateString("he-IL")}</span>
-              <span className="lightbox-caption-separator">|</span>
-              <span>תמונה {currentIndex + 1} מתוך {dailyPhotos.length}</span>
+            {/* Frosted Glass Caption */}
+            <div className="lightbox-caption-overlay">
+              {dailyPhotos[currentIndex].caption ? (
+                <h4 className="lightbox-caption-title">
+                  {dailyPhotos[currentIndex].caption}
+                </h4>
+              ) : (
+                <h4 className="lightbox-caption-title empty">
+                  אין כיתוב לתמונה זו
+                </h4>
+              )}
+              <div className="lightbox-caption-meta">
+                <span>📅 הועלה ב-{new Date(dailyPhotos[currentIndex].created_at).toLocaleDateString("he-IL")}</span>
+                <span className="lightbox-caption-separator">|</span>
+                <span>תמונה {currentIndex + 1} מתוך {dailyPhotos.length}</span>
+              </div>
             </div>
           </div>
         </div>

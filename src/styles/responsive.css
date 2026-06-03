@@ -184,8 +184,6 @@
   }
 
   .lightbox-caption-overlay {
-    bottom: 10px;
-    width: calc(100% - 20px);
     padding: 0.8rem 1rem;
   }
 
