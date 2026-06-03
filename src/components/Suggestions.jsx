@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react';
 import { processImage } from '../lib/imageUtils';
+import toast from 'react-hot-toast';
+import { useSwipe } from '../hooks/useSwipe';
 
-export default function Suggestions({ 
-  isAdmin, 
-  dailyPhotos = [], 
-  onUploadPhoto, 
-  onDeletePhoto, 
+export default function Suggestions({
+  isAdmin,
+  dailyPhotos = [],
+  onUploadPhoto,
+  onDeletePhoto,
   onUpdatePhotoCaption,
-  onSubmitSuggestion 
+  onSubmitSuggestion
 }) {
   const [feedback, setFeedback] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-  
+
   // Photo states
   const [currentIndex, setCurrentIndex] = useState(0);
   const [uploadCaption, setUploadCaption] = useState("");
@@ -28,26 +30,27 @@ export default function Suggestions({
     setEditedCaption(dailyPhotos[currentIndex]?.caption || "");
   }, [currentIndex, dailyPhotos]);
 
+  // Keyboard navigation for lightbox
   useEffect(() => {
     if (!isLightboxOpen) return;
-
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        setIsLightboxOpen(false);
-      } else if (e.key === 'ArrowRight') {
-        if (currentIndex > 0) {
-          setCurrentIndex(currentIndex - 1);
-        }
-      } else if (e.key === 'ArrowLeft') {
-        if (currentIndex < dailyPhotos.length - 1) {
-          setCurrentIndex(currentIndex + 1);
-        }
-      }
+      if (e.key === 'Escape') setIsLightboxOpen(false);
+      else if (e.key === 'ArrowRight' && currentIndex > 0) setCurrentIndex(currentIndex - 1);
+      else if (e.key === 'ArrowLeft' && currentIndex < dailyPhotos.length - 1) setCurrentIndex(currentIndex + 1);
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isLightboxOpen, currentIndex, dailyPhotos.length]);
+
+  // Swipe for gallery and lightbox (RTL: swipe left = older, swipe right = newer)
+  const gallerySwipe = useSwipe({
+    onSwipeLeft: () => { if (currentIndex < dailyPhotos.length - 1) setCurrentIndex(currentIndex + 1); },
+    onSwipeRight: () => { if (currentIndex > 0) setCurrentIndex(currentIndex - 1); },
+  });
+  const lightboxSwipe = useSwipe({
+    onSwipeLeft: () => { if (currentIndex < dailyPhotos.length - 1) setCurrentIndex(currentIndex + 1); },
+    onSwipeRight: () => { if (currentIndex > 0) setCurrentIndex(currentIndex - 1); },
+  });
 
   const handleSaveCaption = async (e) => {
     e.preventDefault();
@@ -58,7 +61,6 @@ export default function Suggestions({
     }
   };
 
-  // 1. Submit suggestion
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!feedback.trim()) return;
@@ -68,7 +70,6 @@ export default function Suggestions({
     setTimeout(() => setShowSuccess(false), 4000);
   };
 
-  // 2. Handle image file selection
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -78,40 +79,36 @@ export default function Suggestions({
         setPreviewUrl(processed.dataUrl);
       } catch (err) {
         console.error("Error processing photo:", err);
-        alert("שגיאה בעיבוד התמונה. נא לנסות קובץ אחר.");
+        toast.error("שגיאה בעיבוד התמונה. נא לנסות קובץ אחר.");
       }
     }
   };
 
-  // 3. Handle image upload submission
   const handleUploadSubmit = async (e) => {
     e.preventDefault();
     if (!previewUrl) return;
-
     setUploading(true);
     try {
       await onUploadPhoto(selectedFile, previewUrl, uploadCaption);
       setSelectedFile(null);
       setPreviewUrl("");
       setUploadCaption("");
-      setCurrentIndex(0); // Reset viewer to see the newly uploaded newest photo
+      setCurrentIndex(0);
+      toast.success("התמונה הועלתה בהצלחה! 📸");
     } catch (err) {
       console.error("Failed to upload photo:", err);
+      toast.error("שגיאה בהעלאת התמונה.");
     } finally {
       setUploading(false);
     }
   };
 
   const handleNextPhoto = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
+    if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
   };
 
   const handlePrevPhoto = () => {
-    if (currentIndex < dailyPhotos.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    }
+    if (currentIndex < dailyPhotos.length - 1) setCurrentIndex(currentIndex + 1);
   };
 
   const handleDeleteCurrent = async () => {
@@ -120,31 +117,22 @@ export default function Suggestions({
     if (photoToDelete && onDeletePhoto) {
       try {
         await onDeletePhoto(photoToDelete.id);
-        // Adjust index if we deleted the last photo
         if (currentIndex >= dailyPhotos.length - 1 && currentIndex > 0) {
           setCurrentIndex(currentIndex - 1);
         }
       } catch (err) {
         console.error("Failed to delete photo:", err);
+        toast.error("שגיאה במחיקת התמונה.");
       }
     }
   };
 
   return (
     <section className="suggestions-section">
-      
+
       {/* 📸 DAILY PHOTO GALLERY CARD */}
-      <div style={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          background: 'var(--white-card)',
-          borderRadius: 'var(--radius-lg)',
-          padding: '1.5rem',
-          boxShadow: 'var(--shadow-soft)',
-          marginBottom: '1.5rem',
-          border: '1.5px solid rgba(2, 136, 209, 0.18)'
-        }}>
-        <h3 style={{ color: 'var(--forest-green)', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <div className="gallery-card">
+        <h3>
           <span>📸</span> פינת התמונה היומית
         </h3>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.8rem' }}>
@@ -154,59 +142,32 @@ export default function Suggestions({
         {/* Gallery Display */}
         <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           {dailyPhotos.length === 0 ? (
-            <div style={{
-              border: '2px dashed var(--forest-green-light)',
-              borderRadius: 'var(--radius-md)',
-              padding: '2rem 1rem',
-              textAlign: 'center',
-              color: 'var(--text-muted)',
-              backgroundColor: '#fafbf9'
-            }}>
+            <div className="gallery-empty">
               <span style={{ fontSize: '2.5rem' }}>🏕️</span>
               <h4 style={{ marginTop: '0.5rem', fontWeight: '500' }}>אין תמונה יומית עדיין</h4>
               <p style={{ fontSize: '0.8rem' }}>יהודה יעלה תמונות בקרוב, יש למה לחכות!</p>
             </div>
           ) : (
-            <div style={{ position: 'relative', width: '100%' }}>
-              
-              {/* Image and Attached Caption */}
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '0.6rem',
-                width: '100%',
-                zIndex: 10
-              }}>
-                <img 
-                  src={dailyPhotos[currentIndex].image_data} 
-                  alt={dailyPhotos[currentIndex].caption || "תמונה יומית"} 
-                  style={{
-                    maxWidth: '100%',
-                    maxHeight: '480px',
-                    width: 'auto',
-                    height: 'auto',
-                    objectFit: 'contain',
-                    display: 'block',
-                    borderRadius: 'var(--radius-md)',
-                    boxShadow: 'var(--shadow-md)',
-                    transition: 'var(--transition)',
-                    cursor: 'pointer'
-                  }}
-                  onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.01)'}
-                  onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            <div style={{ position: 'relative', width: '100%' }} {...gallerySwipe}>
+
+              {/* Image and Caption */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem', width: '100%' }}>
+                <img
+                  src={dailyPhotos[currentIndex].image_data}
+                  alt={dailyPhotos[currentIndex].caption || "תמונה יומית"}
+                  className="gallery-image"
                   onClick={() => setIsLightboxOpen(true)}
                   title="לחצו להגדלה במסך מלא 🔍"
                 />
 
                 {/* Caption Area */}
-                <div style={{ width: '100%', maxWidth: '500px', textAlign: 'center' }}>
+                <div className="gallery-caption-area">
                   {isEditingCaption ? (
-                    <form onSubmit={handleSaveCaption} style={{ display: 'flex', gap: '0.5rem', width: '100%', alignItems: 'center' }}>
-                      <input 
-                        type="text" 
-                        value={editedCaption} 
-                        onChange={(e) => setEditedCaption(e.target.value)} 
+                    <form onSubmit={handleSaveCaption} className="gallery-caption-form">
+                      <input
+                        type="text"
+                        value={editedCaption}
+                        onChange={(e) => setEditedCaption(e.target.value)}
                         className="add-item-input"
                         style={{ flexGrow: 1, padding: '0.6rem 0.8rem', fontSize: '1rem', margin: 0, borderRadius: 'var(--radius-sm)', border: '2px solid var(--forest-green-light)', textAlign: 'center' }}
                         placeholder="הוסיפו כיתוב לתמונה..."
@@ -219,22 +180,11 @@ export default function Suggestions({
                     <>
                       {dailyPhotos[currentIndex].caption ? (
                         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.8rem' }}>
-                          <h4 style={{ 
-                            fontFamily: "'Fredoka', cursive",
-                            fontWeight: '500', 
-                            fontSize: '1.3rem', 
-                            margin: 0, 
-                            color: 'var(--text-main)', 
-                            lineHeight: '1.4'
-                          }}>
-                            {dailyPhotos[currentIndex].caption}
-                          </h4>
+                          <h4 className="gallery-caption-text">{dailyPhotos[currentIndex].caption}</h4>
                           {isAdmin && (
-                            <button 
-                              onClick={() => { setIsEditingCaption(true); setEditedCaption(dailyPhotos[currentIndex].caption || ""); }} 
-                              style={{ background: 'transparent', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'var(--transition)', opacity: 0.6 }} 
-                              onMouseOver={(e) => e.currentTarget.style.opacity = '1'}
-                              onMouseOut={(e) => e.currentTarget.style.opacity = '0.6'}
+                            <button
+                              className="gallery-edit-caption-btn"
+                              onClick={() => { setIsEditingCaption(true); setEditedCaption(dailyPhotos[currentIndex].caption || ""); }}
                               title="ערוך כיתוב"
                             >
                               ✏️
@@ -243,16 +193,13 @@ export default function Suggestions({
                         </div>
                       ) : (
                         isAdmin && (
-                          <div>
-                            <button 
-                              onClick={() => { setIsEditingCaption(true); setEditedCaption(""); }} 
-                              style={{ background: 'transparent', border: 'none', color: 'var(--campfire-amber)', cursor: 'pointer', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.95rem', transition: 'var(--transition)' }}
-                              onMouseOver={(e) => e.currentTarget.style.opacity = '0.8'}
-                              onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
-                            >
-                              ✏️ הוספת כיתוב לתמונה
-                            </button>
-                          </div>
+                          <button
+                            className="gallery-edit-caption-btn"
+                            style={{ color: 'var(--campfire-amber)', fontWeight: '600', fontSize: '0.95rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+                            onClick={() => { setIsEditingCaption(true); setEditedCaption(""); }}
+                          >
+                            ✏️ הוספת כיתוב לתמונה
+                          </button>
                         )
                       )}
                     </>
@@ -261,168 +208,62 @@ export default function Suggestions({
               </div>
 
               {/* Date & Carousel Controls */}
-              <div style={{
-                marginTop: '1.2rem',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '0.8rem',
-                position: 'relative',
-                zIndex: 11
-              }}>
-                {/* Centered Date Badge */}
-                <div style={{ 
-                  display: 'flex', 
-                  flexDirection: 'column',
-                  alignItems: 'center', 
-                  gap: '0.4rem',
-                  width: '100%'
-                }}>
-                  <span style={{ 
-                    fontSize: '0.82rem', 
-                    color: 'var(--text-muted)', 
-                    display: 'inline-flex', 
-                    alignItems: 'center', 
-                    gap: '0.35rem',
-                    background: '#f8fafc',
-                    border: '1px solid #e2e8f0',
-                    padding: '0.3rem 0.8rem',
-                    borderRadius: '50px',
-                    fontWeight: '500',
-                    direction: 'rtl'
-                  }}>
+              <div className="gallery-controls">
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem', width: '100%' }}>
+                  <span className="gallery-date-badge">
                     <span>📅</span> הועלה ב-{new Date(dailyPhotos[currentIndex].created_at).toLocaleDateString("he-IL")}
                   </span>
-                  
                   {isAdmin && (
-                    <button 
-                      onClick={handleDeleteCurrent}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: 'var(--red-warning)',
-                        cursor: 'pointer',
-                        fontSize: '0.78rem',
-                        fontWeight: 'bold',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.2rem',
-                        padding: '0.2rem 0.5rem',
-                        borderRadius: 'var(--radius-sm)',
-                        transition: 'var(--transition)',
-                        opacity: 0.7
-                      }}
-                      onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'var(--red-light)'; e.currentTarget.style.opacity = '1'; }}
-                      onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.opacity = '0.7'; }}
-                    >
+                    <button onClick={handleDeleteCurrent} className="gallery-delete-btn">
                       🗑️ מחיקת תמונה
                     </button>
                   )}
                 </div>
 
-                {/* Carousel controls */}
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: '1.5rem',
-                  marginTop: '0.5rem',
-                  padding: '0.6rem 1.2rem',
-                  background: '#f8fafc',
-                  borderRadius: '50px',
-                  boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)',
-                  border: '1px solid #e2e8f0'
-                }}>
-                  <button 
-                    onClick={handlePrevPhoto} 
+                <div className="gallery-nav-container">
+                  <button
+                    onClick={handlePrevPhoto}
                     disabled={currentIndex === dailyPhotos.length - 1}
-                    style={{
-                      background: currentIndex === dailyPhotos.length - 1 ? 'transparent' : '#ffffff',
-                      color: currentIndex === dailyPhotos.length - 1 ? '#cbd5e1' : 'var(--forest-green)',
-                      border: 'none',
-                      padding: '0.4rem 0.8rem',
-                      borderRadius: '50px',
-                      fontWeight: '600',
-                      fontSize: '0.9rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.4rem',
-                      cursor: currentIndex === dailyPhotos.length - 1 ? 'default' : 'pointer',
-                      transition: 'var(--transition)',
-                      boxShadow: currentIndex === dailyPhotos.length - 1 ? 'none' : '0 1px 3px rgba(0,0,0,0.05)'
-                    }}
+                    className="gallery-nav-btn"
                   >
                     <span style={{ fontSize: '1.2rem', lineHeight: 1 }}>→</span> ישנות
                   </button>
-                  
-                  <div style={{ 
-                    fontWeight: '600', 
-                    fontSize: '0.9rem', 
-                    color: '#64748b',
-                    padding: '0 0.5rem'
-                  }}>
+
+                  <div className="gallery-nav-count">
                     תמונה {currentIndex + 1} מתוך {dailyPhotos.length}
                   </div>
 
-                  <button 
-                    onClick={handleNextPhoto} 
+                  <button
+                    onClick={handleNextPhoto}
                     disabled={currentIndex === 0}
-                    style={{
-                      background: currentIndex === 0 ? 'transparent' : '#ffffff',
-                      color: currentIndex === 0 ? '#cbd5e1' : 'var(--forest-green)',
-                      border: 'none',
-                      padding: '0.4rem 0.8rem',
-                      borderRadius: '50px',
-                      fontWeight: '600',
-                      fontSize: '0.9rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.4rem',
-                      cursor: currentIndex === 0 ? 'default' : 'pointer',
-                      transition: 'var(--transition)',
-                      boxShadow: currentIndex === 0 ? 'none' : '0 1px 3px rgba(0,0,0,0.05)'
-                    }}
+                    className="gallery-nav-btn"
                   >
                     חדשות <span style={{ fontSize: '1.2rem', lineHeight: 1 }}>←</span>
                   </button>
                 </div>
               </div>
-
             </div>
           )}
         </div>
 
         {/* ADMIN UPLOAD FORM */}
         {isAdmin && (
-          <div style={{
-            marginTop: '1rem',
-            paddingTop: '1rem',
-            borderTop: '1px solid var(--forest-green-light)'
-          }}>
-            <h4 style={{ color: 'var(--campfire-amber)', marginBottom: '0.5rem', fontSize: '0.95rem' }}>
-              🔧 העלאת תמונה יומית (מנהל בלבד)
-            </h4>
-            
-            <form onSubmit={handleUploadSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                <input 
-                  type="file" 
-                  accept="image/*" 
+          <div className="upload-section">
+            <h4>🔧 העלאת תמונה יומית (מנהל בלבד)</h4>
+            <form onSubmit={handleUploadSubmit} className="upload-form">
+              <div className="upload-file-row">
+                <input
+                  type="file"
+                  accept="image/*"
                   id="daily-photo-file"
                   onChange={handleFileChange}
                   style={{ display: 'none' }}
                   required={!previewUrl}
                 />
-                <label 
-                  htmlFor="daily-photo-file" 
+                <label
+                  htmlFor="daily-photo-file"
                   className="tab-btn"
-                  style={{
-                    display: 'inline-block',
-                    padding: '0.5rem 1rem',
-                    backgroundColor: 'var(--forest-green-light)',
-                    color: 'var(--forest-green)',
-                    cursor: 'pointer'
-                  }}
+                  style={{ display: 'inline-block', padding: '0.5rem 1rem', backgroundColor: 'var(--forest-green-light)', color: 'var(--forest-green)', cursor: 'pointer' }}
                 >
                   {selectedFile ? "שנה תמונה 🖼️" : "בחר תמונה 🖼️"}
                 </label>
@@ -432,46 +273,23 @@ export default function Suggestions({
               </div>
 
               {previewUrl && (
-                <div style={{ 
-                  position: 'relative', 
-                  width: '120px', 
-                  maxHeight: '120px', 
-                  borderRadius: '8px', 
-                  overflow: 'hidden', 
-                  border: '1px solid var(--forest-green-light)',
-                  backgroundColor: '#1a202c',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginTop: '0.5rem'
-                }}>
-                  <img 
-                    src={previewUrl} 
-                    alt="תצוגה מקדימה" 
-                    style={{ 
-                      maxWidth: '100%', 
-                      maxHeight: '120px', 
-                      width: 'auto',
-                      height: 'auto',
-                      objectFit: 'contain',
-                      display: 'block'
-                    }} 
-                  />
+                <div className="upload-preview">
+                  <img src={previewUrl} alt="תצוגה מקדימה" />
                 </div>
               )}
 
-              <input 
-                type="text" 
-                className="add-item-input" 
+              <input
+                type="text"
+                className="add-item-input"
                 placeholder="הוסיפו כיתוב מעניין לתמונה..."
                 value={uploadCaption}
                 onChange={(e) => setUploadCaption(e.target.value)}
                 style={{ padding: '0.5rem 0.8rem', fontSize: '0.9rem' }}
               />
 
-              <button 
-                type="submit" 
-                className="btn-primary" 
+              <button
+                type="submit"
+                className={`btn-primary${uploading ? ' btn-loading' : ''}`}
                 disabled={uploading || !previewUrl}
                 style={{ margin: 0, padding: '0.6rem' }}
               >
@@ -482,47 +300,30 @@ export default function Suggestions({
         )}
       </div>
 
-      {/* 💡 WARM SUGGESTIONS CARD */}
-      <div id="suggestions" style={{ 
-          scrollMarginTop: '80px',
-          background: 'var(--white-card)',
-          borderRadius: 'var(--radius-lg)',
-          padding: '2.5rem',
-          boxShadow: 'var(--shadow-soft)',
-          marginBottom: '2.5rem',
-          border: '1.5px solid rgba(30, 70, 32, 0.15)'
-        }}>
+      {/* 💡 SUGGESTIONS CARD */}
+      <div id="suggestions" className="feedback-section">
         <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <span>💡</span> בואו נבנה את זה ביחד!
         </h3>
         <p style={{ fontSize: '0.95rem', lineHeight: '1.5' }}>
           האתר הזה הוא של כולנו! נשמח לשמוע רעיונות לפיצ'רים חדשים, כלים שיעזרו לנו לקראת המחנה, משחקים, או סתם בדיחות שיעשו לנו שמח בלב. כל הצעה תגיע ישירות ליהודה.
         </p>
-        
+
         <form onSubmit={handleSubmit} style={{ marginTop: '1.2rem' }}>
-          <textarea 
-            className="feedback-textarea" 
-            placeholder="ספרו לנו על רעיון, כלי, משחק או מידע שהיה עוזר לכם או מצחיק אותנו..." 
+          <textarea
+            className="feedback-textarea"
+            placeholder="ספרו לנו על רעיון, כלי, משחק או מידע שהיה עוזר לכם..."
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
             required
             style={{ minHeight: '120px' }}
-          ></textarea>
+            maxLength={500}
+          />
           <button type="submit" className="btn-secondary" style={{ marginTop: '0.8rem' }}>שלח הצעה ליהודה 🚀</button>
         </form>
 
         {showSuccess && (
-          <div style={{
-            marginTop: '1rem',
-            padding: '0.8rem',
-            backgroundColor: 'var(--forest-green-light)',
-            color: 'var(--forest-green)',
-            borderRadius: 'var(--radius-sm)',
-            fontWeight: '600',
-            textAlign: 'center',
-            border: '1px solid rgba(30, 70, 32, 0.15)',
-            animation: 'check-pop 0.3s ease-out'
-          }}>
+          <div className="feedback-success">
             תודה! ההצעה שלך נשלחה ישירות ליהודה 📬
           </div>
         )}
@@ -530,167 +331,71 @@ export default function Suggestions({
 
       {/* Lightbox Modal */}
       {isLightboxOpen && dailyPhotos.length > 0 && (
-        <div 
+        <div
           className="lightbox-overlay"
           style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
+            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
             backgroundColor: 'rgba(15, 23, 42, 0.9)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            zIndex: 9999,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
+            backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+            zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center'
           }}
           onClick={() => setIsLightboxOpen(false)}
+          {...lightboxSwipe}
         >
           {/* Close button */}
-          <button 
+          <button
             onClick={() => setIsLightboxOpen(false)}
             style={{
-              position: 'absolute',
-              top: '20px',
-              right: '20px',
-              background: 'rgba(255, 255, 255, 0.12)',
-              border: 'none',
-              borderRadius: '50%',
-              width: '44px',
-              height: '44px',
-              color: '#fff',
-              fontSize: '1.5rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'var(--transition)',
+              position: 'absolute', top: '20px', right: '20px',
+              background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: '50%',
+              width: '44px', height: '44px', color: '#fff', fontSize: '1.5rem',
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
               zIndex: 10001
             }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.25)'}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.12)'}
             title="סגור (Esc)"
           >
             ✕
           </button>
 
-          {/* Navigation - Prev (Older) */}
+          {/* Nav – Prev (Older) */}
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handlePrevPhoto();
-            }}
+            onClick={(e) => { e.stopPropagation(); handlePrevPhoto(); }}
             disabled={currentIndex === dailyPhotos.length - 1}
             className="lightbox-nav-btn"
-            style={{
-              position: 'absolute',
-              left: '30px',
-              zIndex: 10000,
-              opacity: currentIndex === dailyPhotos.length - 1 ? 0.3 : 1
-            }}
-            title="תמונה קודמת (חץ שמאלה)"
-          >
-            ‹
-          </button>
+            style={{ position: 'absolute', left: '30px', zIndex: 10000, opacity: currentIndex === dailyPhotos.length - 1 ? 0.3 : 1 }}
+          >‹</button>
 
-          {/* Navigation - Next (Newer) */}
+          {/* Nav – Next (Newer) */}
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleNextPhoto();
-            }}
+            onClick={(e) => { e.stopPropagation(); handleNextPhoto(); }}
             disabled={currentIndex === 0}
             className="lightbox-nav-btn"
-            style={{
-              position: 'absolute',
-              right: '30px',
-              zIndex: 10000,
-              opacity: currentIndex === 0 ? 0.3 : 1
-            }}
-            title="תמונה הבאה (חץ ימינה)"
-          >
-            ›
-          </button>
+            style={{ position: 'absolute', right: '30px', zIndex: 10000, opacity: currentIndex === 0 ? 0.3 : 1 }}
+          >›</button>
 
-          {/* Centered Image Container */}
-          <div 
-            style={{
-              position: 'relative',
-              maxWidth: '90%',
-              maxHeight: '80%',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
+          {/* Image Container */}
+          <div
+            style={{ position: 'relative', maxWidth: '90%', maxHeight: '80%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <img 
-              src={dailyPhotos[currentIndex].image_data} 
-              alt={dailyPhotos[currentIndex].caption || "תמונה יומית"} 
-              style={{
-                maxWidth: '100%',
-                maxHeight: '80vh',
-                objectFit: 'contain',
-                borderRadius: 'var(--radius-md)',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
-              }}
+            <img
+              src={dailyPhotos[currentIndex].image_data}
+              alt={dailyPhotos[currentIndex].caption || "תמונה יומית"}
+              style={{ maxWidth: '100%', maxHeight: '80vh', objectFit: 'contain', borderRadius: 'var(--radius-md)', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }}
             />
 
-            {/* Frosted Glass Caption Overlay */}
-            <div 
-              style={{
-                position: 'absolute',
-                bottom: '20px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: 'calc(100% - 40px)',
-                maxWidth: '600px',
-                background: 'rgba(15, 23, 42, 0.65)',
-                backdropFilter: 'blur(10px)',
-                WebkitBackdropFilter: 'blur(10px)',
-                borderRadius: 'var(--radius-md)',
-                padding: '1rem 1.5rem',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                color: '#fff',
-                textAlign: 'center',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-                direction: 'rtl'
-              }}
-            >
+            {/* Frosted Glass Caption */}
+            <div className="lightbox-caption-overlay">
               {dailyPhotos[currentIndex].caption ? (
-                <h4 style={{ 
-                  fontFamily: "'Fredoka', cursive",
-                  fontWeight: '500', 
-                  fontSize: '1.25rem', 
-                  margin: '0 0 0.4rem 0',
-                  color: '#fff',
-                  lineHeight: '1.4'
-                }}>
+                <h4 style={{ fontFamily: "'Fredoka', cursive", fontWeight: '500', fontSize: '1.25rem', margin: '0 0 0.4rem 0', color: '#fff', lineHeight: '1.4' }}>
                   {dailyPhotos[currentIndex].caption}
                 </h4>
               ) : (
-                <h4 style={{ 
-                  fontFamily: "'Fredoka', cursive",
-                  fontWeight: '400', 
-                  fontSize: '1rem', 
-                  margin: '0 0 0.4rem 0',
-                  color: 'rgba(255, 255, 255, 0.6)',
-                  fontStyle: 'italic'
-                }}>
+                <h4 style={{ fontFamily: "'Fredoka', cursive", fontWeight: '400', fontSize: '1rem', margin: '0 0 0.4rem 0', color: 'rgba(255,255,255,0.6)', fontStyle: 'italic' }}>
                   אין כיתוב לתמונה זו
                 </h4>
               )}
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                alignItems: 'center', 
-                gap: '1rem',
-                fontSize: '0.8rem',
-                color: 'rgba(255, 255, 255, 0.7)'
-              }}>
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)' }}>
                 <span>📅 הועלה ב-{new Date(dailyPhotos[currentIndex].created_at).toLocaleDateString("he-IL")}</span>
                 <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
                 <span>תמונה {currentIndex + 1} מתוך {dailyPhotos.length}</span>

@@ -1,0 +1,141 @@
+/* ==========================================
+   COUNTDOWN TIMER SECTION
+   ========================================== */
+.countdown-section {
+  background: linear-gradient(135deg, var(--forest-green), #2d5a30);
+  color: var(--white-card);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem 2rem;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.countdown-section::before {
+  content: "";
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 150px;
+  height: 150px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+}
+
+.countdown-title {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.countdown-grid {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  direction: ltr;
+}
+
+.countdown-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(5px);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-md);
+  min-width: 90px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  transition: var(--transition);
+}
+
+.countdown-card:hover {
+  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.countdown-value {
+  font-size: 2.5rem;
+  font-family: 'Fredoka', cursive;
+  font-weight: 700;
+  display: block;
+}
+
+.countdown-label {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.9;
+  display: block;
+  margin-top: 4px;
+  font-family: 'Fredoka', sans-serif;
+}
+
+/* Playful Subtitle */
+.countdown-subtitle {
+  background-color: var(--campfire-amber);
+  color: var(--white-card);
+  padding: 0.6rem 1.5rem;
+  border-radius: 50px;
+  display: inline-block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(230, 81, 0, 0.3);
+  animation: pulse-soft 3s infinite;
+  margin-top: 1rem;
+}
+
+/* Campfire animated graphic */
+.campfire-animation {
+  position: absolute;
+  bottom: 10px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.3;
+}
+
+.fire-flame {
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle at bottom, #ff9100 20%, #d50000 70%);
+  border-radius: 50% 50% 20% 50%;
+  transform: rotate(-45deg);
+  animation: flame-flicker 1.5s ease-in-out infinite;
+}
+
+.fire-logs {
+  width: 46px;
+  height: 8px;
+  background: #5d4037;
+  border-radius: 4px;
+  margin-top: -5px;
+  position: relative;
+}
+
+.fire-logs::after {
+  content: "";
+  position: absolute;
+  width: 46px;
+  height: 8px;
+  background: #4e342e;
+  border-radius: 4px;
+  transform: rotate(20deg);
+  top: 0;
+  left: 0;
+}
+
+/* ==========================================
+   HERO GRID (Countdown & Birthdays)
+   ========================================== */
+.hero-grid {
+  display: grid;
+  grid-template-columns: 2.4fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  align-items: start;
+}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { supabase, isSupabaseActive } from './lib/supabase';
 import AuthScreen, { AvatarSVG } from './components/AuthScreen';
 import Countdown from './components/Countdown';
@@ -84,60 +85,65 @@ export default function App() {
 
   useEffect(() => {
     const initApp = async () => {
-      if (isSupabaseActive) {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          // Fetch current user profile
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", session.user.id)
-            .single();
+      try {
+        if (isSupabaseActive) {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            // Fetch current user profile
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("*")
+              .eq("id", session.user.id)
+              .single();
 
-          const user = {
-            id: session.user.id,
-            email: session.user.email,
-            name: profile?.full_name || session.user.email,
-            role: profile?.role || "שליח/ה",
-            avatar: profile?.avatar || "campfire",
-            birthday: profile?.birthday
-          };
-          setCurrentUser(user);
-          await syncData(user);
-        }
-      } else {
-        // Local storage fallback loading
-        const storedUser = localStorage.getItem("ramah_user");
-        if (storedUser) {
-          setCurrentUser(JSON.parse(storedUser));
-        }
-        
-        const storedChecked = localStorage.getItem("ramah_checked_states");
-        if (storedChecked) {
-          setCheckedStates(JSON.parse(storedChecked));
-        }
-        
-        const storedCustom = localStorage.getItem("ramah_custom_items");
-        if (storedCustom) {
-          setCustomItems(JSON.parse(storedCustom));
-        }
+            const user = {
+              id: session.user.id,
+              email: session.user.email,
+              name: profile?.full_name || session.user.email,
+              role: profile?.role || "שליח/ה",
+              avatar: profile?.avatar || "campfire",
+              birthday: profile?.birthday
+            };
+            setCurrentUser(user);
+            await syncData(user);
+          }
+        } else {
+          // Local storage fallback loading
+          const storedUser = localStorage.getItem("ramah_user");
+          if (storedUser) {
+            setCurrentUser(JSON.parse(storedUser));
+          }
+          
+          const storedChecked = localStorage.getItem("ramah_checked_states");
+          if (storedChecked) {
+            setCheckedStates(JSON.parse(storedChecked));
+          }
+          
+          const storedCustom = localStorage.getItem("ramah_custom_items");
+          if (storedCustom) {
+            setCustomItems(JSON.parse(storedCustom));
+          }
 
-        const storedSuggestions = localStorage.getItem("ramah_suggestions");
-        if (storedSuggestions) {
-          setSuggestions(JSON.parse(storedSuggestions));
-        }
+          const storedSuggestions = localStorage.getItem("ramah_suggestions");
+          if (storedSuggestions) {
+            setSuggestions(JSON.parse(storedSuggestions));
+          }
 
-        const storedPhotos = localStorage.getItem("ramah_daily_photos");
-        if (storedPhotos) {
-          setDailyPhotos(JSON.parse(storedPhotos));
-        }
+          const storedPhotos = localStorage.getItem("ramah_daily_photos");
+          if (storedPhotos) {
+            setDailyPhotos(JSON.parse(storedPhotos));
+          }
 
-        const storedNewspaper = localStorage.getItem("ramah_newspaper");
-        if (storedNewspaper) {
-          setNewspaperData(JSON.parse(storedNewspaper));
+          const storedNewspaper = localStorage.getItem("ramah_newspaper");
+          if (storedNewspaper) {
+            setNewspaperData(JSON.parse(storedNewspaper));
+          }
         }
+      } catch (err) {
+        console.error("Error during app initialization:", err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     initApp();
@@ -410,7 +416,7 @@ export default function App() {
           }
         } catch (err) {
           console.error("Failed to upload avatar:", err);
-          alert("שגיאה בהעלאת התמונה: " + err.message);
+          toast.error("שגיאה בהעלאת התמונה: " + err.message);
           return;
         }
       } else {
@@ -451,7 +457,7 @@ export default function App() {
         ));
       } catch (err) {
         console.error("Failed to update profile:", err);
-        alert("שגיאה בעדכון הפרופיל: " + err.message);
+        toast.error("שגיאה בעדכון הפרופיל: " + err.message);
         return;
       }
     } else {
@@ -514,7 +520,7 @@ export default function App() {
         }
       } catch (err) {
         console.error("Failed to update avatar:", err);
-        alert("שגיאה בעדכון תמונת הפרופיל: " + err.message);
+        toast.error("שגיאה בעדכון תמונת הפרופיל: " + err.message);
       }
     } else {
       const reader = new FileReader();
@@ -658,20 +664,11 @@ export default function App() {
               </div>
             </div>
             
-            <div style={{ display: 'flex', gap: '0.8rem' }}>
+            <div className="header-buttons">
               {currentUser.email === 'geleryehuda@gmail.com' && (
-                <button 
+                <button
                   onClick={() => setShowAdminPanel(true)}
-                  style={{
-                    backgroundColor: 'var(--forest-green)',
-                    color: 'var(--white-card)',
-                    border: 'none',
-                    padding: '0.5rem 1rem',
-                    borderRadius: 'var(--radius-md)',
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                    fontFamily: 'Fredoka, sans-serif'
-                  }}
+                  className="admin-panel-btn"
                 >
                   🛠️ פאנל ניהול
                 </button>

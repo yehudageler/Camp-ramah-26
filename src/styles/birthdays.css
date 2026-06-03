@@ -1,0 +1,116 @@
+/* ==========================================
+   BIRTHDAYS CORNER
+   ========================================== */
+.birthdays-section {
+  background: var(--white-card);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-soft);
+  border: 1.5px solid rgba(230, 81, 0, 0.18);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.birthdays-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+  flex-shrink: 0;
+}
+
+.birthdays-icon {
+  font-size: 2rem;
+}
+
+.birthdays-title {
+  color: var(--campfire-amber);
+  margin: 0;
+  font-size: 1.3rem;
+  font-family: 'Fredoka', cursive;
+}
+
+.birthdays-subtitle {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+.birthdays-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.birthdays-empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: 1.5rem 0;
+}
+
+.birthday-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  transition: var(--transition);
+  cursor: default;
+}
+
+@media (hover: hover) {
+  .birthday-item:hover {
+    transform: translateX(-4px);
+    box-shadow: var(--shadow-soft);
+  }
+}
+
+.birthday-item:active {
+  transform: scale(0.98);
+}
+
+.birthday-item--today {
+  background: var(--campfire-light);
+  border-color: var(--campfire-amber);
+  animation: pulse-soft 3s infinite;
+}
+
+.birthday-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--forest-green-light);
+  flex-shrink: 0;
+}
+
+.birthday-avatar--today {
+  border-color: var(--campfire-amber);
+}
+
+.birthday-info {
+  flex-grow: 1;
+}
+
+.birthday-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.birthday-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.birthday-emoji {
+  font-size: 1.3rem;
+}

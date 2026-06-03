@@ -1,0 +1,213 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Varela+Round&display=swap');
+
+:root {
+  --forest-green: #1e4620;
+  --forest-green-hover: #153216;
+  --forest-green-light: #e8f5e9;
+  --campfire-amber: #e65100;
+  --campfire-amber-hover: #bf360c;
+  --campfire-light: #fff3e0;
+  --lake-blue: #0288d1;
+  --lake-blue-hover: #01579b;
+  --lake-light: #e1f5fe;
+  --cream-bg: #fdfbf7;
+  --white-card: #ffffff;
+  --text-main: #202a25;
+  --text-muted: #526058;
+  --red-warning: #c62828;
+  --red-light: #ffebee;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --shadow-soft: 0 2px 8px rgba(30, 70, 32, 0.04), 0 8px 24px rgba(30, 70, 32, 0.03);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05), 0 12px 32px rgba(0, 0, 0, 0.04);
+  --shadow-block: 0 4px 12px rgba(30, 70, 32, 0.03), 0 12px 32px rgba(30, 70, 32, 0.03);
+  --shadow-block-amber: 0 4px 12px rgba(230, 81, 0, 0.03), 0 12px 32px rgba(230, 81, 0, 0.03);
+  --shadow-block-blue: 0 4px 12px rgba(2, 136, 209, 0.03), 0 12px 32px rgba(2, 136, 209, 0.03);
+  --transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--forest-green) transparent;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--forest-green);
+  border-radius: 10px;
+  border: 2px solid var(--cream-bg);
+}
+
+body {
+  font-family: 'Varela Round', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--cream-bg);
+  color: var(--text-main);
+  direction: rtl;
+  min-height: 100vh;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-heading {
+  font-family: 'Fredoka', cursive;
+  font-weight: 600;
+}
+
+/* Main Container styling */
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  padding-bottom: 100px;
+  /* Space for floating nav */
+}
+
+/* Animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes pulse-soft {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.03);
+    opacity: 0.95;
+  }
+}
+
+@keyframes flame-flicker {
+
+  0%,
+  100% {
+    transform: scale(1) rotate(-2deg);
+  }
+
+  50% {
+    transform: scale(1.08) rotate(2deg);
+    filter: brightness(1.2);
+  }
+}
+
+@keyframes check-pop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Hidden elements */
+.hidden {
+  display: none !important;
+}
+
+/* Shared button styles */
+.btn-primary {
+  width: 100%;
+  background: var(--forest-green);
+  color: var(--white-card);
+  border: none;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 4px 12px rgba(30, 70, 32, 0.15);
+  font-family: 'Fredoka', sans-serif;
+  margin-top: 1rem;
+}
+
+.btn-primary:hover {
+  background: var(--forest-green-hover);
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 24px rgba(30, 70, 32, 0.2);
+}
+
+.btn-primary:active {
+  transform: translateY(0) scale(0.97);
+  box-shadow: 0 2px 8px rgba(30, 70, 32, 0.15);
+}
+
+.btn-secondary {
+  background: var(--forest-green);
+  color: var(--white-card);
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-secondary:hover {
+  background: var(--forest-green-hover);
+}
+
+/* Loading button state */
+.btn-loading {
+  opacity: 0.7;
+  pointer-events: none;
+  position: relative;
+}
+
+.btn-loading::after {
+  content: "";
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

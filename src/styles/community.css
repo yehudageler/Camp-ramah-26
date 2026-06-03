@@ -1,0 +1,272 @@
+/* ==========================================
+   SOCIAL COMMUNITY WALL
+   ========================================== */
+.community-section {
+  background: var(--white-card);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 2.5rem;
+  border: 1.5px solid rgba(230, 81, 0, 0.18);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.section-title {
+  color: var(--forest-green);
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-box {
+  position: relative;
+  min-width: 280px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.6rem 2.5rem 0.6rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 20px;
+  outline: none;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: var(--transition);
+}
+
+.search-input:focus {
+  border-color: var(--forest-green);
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  color: #a0aec0;
+  pointer-events: none;
+}
+
+.community-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+  gap: 1.2rem;
+}
+
+/* Counselor Trading Card */
+.counselor-card {
+  perspective: 1000px;
+  height: 190px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.counselor-card:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.counselor-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.counselor-card.flipped .counselor-inner {
+  transform: rotateY(180deg);
+}
+
+.counselor-front,
+.counselor-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: var(--radius-md);
+  padding: 0.5rem 0.6rem;
+  border: 1.5px solid rgba(30, 70, 32, 0.15);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.counselor-front {
+  background: var(--white-card);
+}
+
+.counselor-back {
+  background: var(--forest-green-light);
+  transform: rotateY(180deg);
+  border-color: var(--forest-green);
+  overflow-y: auto;
+}
+
+.counselor-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--forest-green);
+  margin-bottom: 0.4rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.counselor-name {
+  font-family: 'Fredoka', cursive;
+  font-size: 1.1rem;
+  color: var(--forest-green);
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.counselor-role {
+  font-size: 0.8rem;
+  color: var(--white-card);
+  background: var(--campfire-amber);
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.card-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 1rem;
+  opacity: 0.7;
+}
+
+/* List View layout */
+.community-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 0.8rem;
+}
+
+.counselor-list-item {
+  display: flex;
+  align-items: center;
+  background: var(--white-card);
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid rgba(30, 70, 32, 0.15);
+  box-shadow: var(--shadow-soft);
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .counselor-list-item:hover {
+    transform: translateX(-4px);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.counselor-list-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--forest-green);
+  overflow: hidden;
+  margin-left: 1rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+}
+
+.counselor-list-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-grow: 1;
+}
+
+.counselor-list-name {
+  font-family: 'Fredoka', cursive;
+  font-size: 1.1rem;
+  color: var(--forest-green);
+  font-weight: 600;
+  margin-bottom: 0.1rem;
+}
+
+.counselor-list-role {
+  font-size: 0.75rem;
+  color: var(--white-card);
+  background: var(--campfire-amber);
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+/* View Toggle Buttons */
+.view-toggle {
+  display: flex;
+  background: #edf2f7;
+  border-radius: 20px;
+  padding: 4px;
+}
+
+.view-toggle-btn {
+  background: transparent;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: var(--transition);
+  color: #718096;
+}
+
+.view-toggle-btn.active {
+  background: var(--white-card);
+  color: var(--forest-green);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Card Stats (Back of Card) */
+.counselor-stats {
+  width: 100%;
+  text-align: right;
+}
+
+.counselor-stats-title {
+  font-size: 1rem;
+  color: var(--forest-green);
+  border-bottom: 1px solid rgba(30, 72, 32, 0.2);
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.stat-item {
+  font-size: 0.8rem;
+  margin-bottom: 6px;
+}
+
+.stat-label {
+  font-weight: 700;
+  color: var(--forest-green);
+}

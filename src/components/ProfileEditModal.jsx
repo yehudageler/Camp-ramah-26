@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AvatarSVG } from './AuthScreen';
 import { processImage } from '../lib/imageUtils';
+import toast from 'react-hot-toast';
 
 export default function ProfileEditModal({ currentUser, onClose, onSave }) {
   const [name, setName] = useState(currentUser.name || "");
@@ -17,13 +18,12 @@ export default function ProfileEditModal({ currentUser, onClose, onSave }) {
     setProcessing(true);
     try {
       const processed = await processImage(file, { forceSquare: true, targetSize: 300 });
-      // Use the base64 preview for instant visual feedback inside the modal
-      setAvatar(processed.preview);
-      // Keep the processed File object to upload on save
+      // Fix: use dataUrl (not preview which doesn't exist)
+      setAvatar(processed.dataUrl);
       setAvatarFile(processed.file);
     } catch (err) {
       console.error("Image processing failed:", err);
-      alert("עיבוד התמונה נכשל. נסה תמונה אחרת.");
+      toast.error("עיבוד התמונה נכשל. נסה תמונה אחרת.");
     } finally {
       setProcessing(false);
     }
@@ -32,7 +32,7 @@ export default function ProfileEditModal({ currentUser, onClose, onSave }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!name.trim() || !role.trim()) {
-      alert("נא למלא שם ותפקיד");
+      toast.error("נא למלא שם ותפקיד");
       return;
     }
 
@@ -41,7 +41,7 @@ export default function ProfileEditModal({ currentUser, onClose, onSave }) {
       role: role.trim(),
       birthday: birthday || null,
       avatar: avatar,
-      avatarFile: avatarFile // Will be null if the user didn't select a new photo
+      avatarFile: avatarFile
     });
   };
 
@@ -55,50 +55,28 @@ export default function ProfileEditModal({ currentUser, onClose, onSave }) {
 
         <form onSubmit={handleSubmit}>
           {/* Avatar / Photo Upload section */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem', gap: '0.8rem' }}>
-            <div style={{ position: 'relative', width: '100px', height: '100px' }}>
+          <div className="modal-avatar-section">
+            <div className="modal-avatar-wrapper">
               <AvatarSVG avatarType={avatar} size={100} />
               {processing && (
-                <div style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  background: 'rgba(255, 255, 255, 0.7)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: '50%',
-                  fontSize: '0.8rem',
-                  fontWeight: 'bold',
-                  color: 'var(--forest-green)'
-                }}>
+                <div className="modal-avatar-processing">
                   מעבד...
                 </div>
               )}
             </div>
-            
-            <label 
-              htmlFor="modal-photo-upload" 
+
+            <label
+              htmlFor="modal-photo-upload"
               className="btn-secondary"
-              style={{ 
-                padding: '0.5rem 1rem', 
-                fontSize: '0.9rem', 
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                margin: 0
-              }}
+              style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}
             >
               📸 העלאת תמונת פרופיל
             </label>
-            <input 
-              type="file" 
-              id="modal-photo-upload" 
-              accept="image/*" 
-              style={{ display: 'none' }} 
+            <input
+              type="file"
+              id="modal-photo-upload"
+              accept="image/*"
+              style={{ display: 'none' }}
               onChange={handleFileChange}
               disabled={processing}
             />
@@ -107,24 +85,26 @@ export default function ProfileEditModal({ currentUser, onClose, onSave }) {
           {/* Form Fields */}
           <div className="form-group">
             <label className="form-label" htmlFor="edit-name">שם מלא</label>
-            <input 
-              type="text" 
-              id="edit-name" 
-              className="form-input" 
-              value={name} 
-              onChange={(e) => setName(e.target.value)} 
+            <input
+              type="text"
+              id="edit-name"
+              className="form-input"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={50}
               required
             />
           </div>
 
           <div className="form-group">
             <label className="form-label" htmlFor="edit-role">תפקיד במחנה</label>
-            <input 
-              type="text" 
-              id="edit-role" 
-              className="form-input" 
-              value={role} 
-              onChange={(e) => setRole(e.target.value)} 
+            <input
+              type="text"
+              id="edit-role"
+              className="form-input"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              maxLength={30}
               required
             />
           </div>
@@ -132,21 +112,21 @@ export default function ProfileEditModal({ currentUser, onClose, onSave }) {
           <div className="form-group">
             <label className="form-label" htmlFor="edit-birthday">תאריך יום הולדת 🎂</label>
             <div className="date-input-wrapper">
-              <input 
-                type="date" 
-                id="edit-birthday" 
-                className="form-input date-picker-input" 
+              <input
+                type="date"
+                id="edit-birthday"
+                className="form-input date-picker-input"
                 value={birthday}
                 onChange={(e) => setBirthday(e.target.value)}
               />
-              <svg 
+              <svg
                 className="date-input-icon"
-                xmlns="http://www.w3.org/2000/svg" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="2" 
-                strokeLinecap="round" 
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
                 strokeLinejoin="round"
               >
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -158,19 +138,18 @@ export default function ProfileEditModal({ currentUser, onClose, onSave }) {
           </div>
 
           {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-            <button 
-              type="submit" 
-              className="btn-primary" 
+          <div className="modal-action-btns">
+            <button
+              type="submit"
+              className={`btn-primary${processing ? ' btn-loading' : ''}`}
               style={{ margin: 0, flex: 1 }}
               disabled={processing}
             >
-              שמור שינויים 💾
+              {processing ? 'שומר...' : 'שמור שינויים 💾'}
             </button>
-            <button 
-              type="button" 
-              className="logout-btn" 
-              style={{ margin: 0, flex: 1, padding: '1rem', border: '1px solid #cbd5e1' }}
+            <button
+              type="button"
+              className="modal-cancel-btn"
               onClick={onClose}
             >
               ביטול ❌

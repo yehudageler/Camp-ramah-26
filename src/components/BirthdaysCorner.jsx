@@ -29,7 +29,6 @@ export default function BirthdaysCorner({ databaseProfiles = [], currentUser = n
       const month = parseInt(parts[1], 10) - 1;
       const day = parseInt(parts[2], 10);
 
-      // Find the next birthday occurrence
       let nextBday = new Date(today.getFullYear(), month, day);
       if (nextBday < today) {
         nextBday = new Date(today.getFullYear() + 1, month, day);
@@ -37,7 +36,6 @@ export default function BirthdaysCorner({ databaseProfiles = [], currentUser = n
 
       const diffTime = nextBday.getTime() - today.getTime();
       const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
       const isToday = daysLeft === 0;
 
       return {
@@ -49,101 +47,52 @@ export default function BirthdaysCorner({ databaseProfiles = [], currentUser = n
     })
     .filter(Boolean)
     .sort((a, b) => a.daysLeft - b.daysLeft)
-    .slice(0, 2); // Get top 2
+    .slice(0, 2);
 
   if (upcomingBirthdays.length === 0) {
     return (
-      <section 
-        style={{
-          background: 'var(--white-card)',
-          borderRadius: 'var(--radius-lg)',
-          padding: '2rem 1.5rem',
-          boxShadow: 'var(--shadow-soft)',
-          border: '1.5px solid rgba(230, 81, 0, 0.18)',
-          direction: 'rtl',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '0.8rem',
-          height: '100%',
-          textAlign: 'center'
-        }}
-      >
-        <span style={{ fontSize: '2.5rem' }}>🎂</span>
-        <h3 style={{ color: 'var(--forest-green)', margin: 0, fontSize: '1.3rem' }}>ימי הולדת קרובים</h3>
-        <div style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>עוד אין חגיגות קרובות, אבל שווה לחכות!</div>
+      <section className="birthdays-section birthdays-section--empty">
+        <span className="birthdays-icon">🎂</span>
+        <h3 className="birthdays-title">ימי הולדת קרובים</h3>
+        <p className="birthdays-empty">עוד אין חגיגות קרובות, אבל שווה לחכות!</p>
       </section>
     );
   }
 
   return (
-    <section 
-      style={{
-        background: 'var(--white-card)',
-        borderRadius: 'var(--radius-lg)',
-        padding: '1.2rem 1rem',
-        boxShadow: 'var(--shadow-soft)',
-        border: '1.5px solid rgba(230, 81, 0, 0.18)',
-        direction: 'rtl',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '0.8rem',
-        height: 'auto'
-      }}
-    >
-      <h3 style={{ 
-        color: 'var(--forest-green)', 
-        display: 'flex', 
-        alignItems: 'center', 
-        gap: '0.5rem', 
-        margin: 0,
-        fontSize: '1.15rem'
-      }}>
-        <span style={{ fontSize: '1.4rem' }}>🎂</span> ימי הולדת קרובים
-      </h3>
-      
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', flexGrow: 1, justifyContent: 'center' }}>
+    <section className="birthdays-section">
+      <div className="birthdays-header">
+        <span className="birthdays-icon">🎂</span>
+        <div>
+          <h3 className="birthdays-title">ימי הולדת קרובים</h3>
+        </div>
+      </div>
+
+      <div className="birthdays-list">
         {upcomingBirthdays.map(b => (
-          <div 
+          <div
             key={b.profile.id}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.8rem',
-              padding: '0.8rem 1rem',
-              background: b.isToday ? 'linear-gradient(135deg, var(--campfire-light), #fff9c4)' : '#f8fafc',
-              border: b.isToday ? '1.5px solid var(--campfire-amber)' : '1px solid #edf2f7',
-              borderRadius: 'var(--radius-md)',
-              transition: 'var(--transition)',
-              cursor: 'default'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = 'var(--shadow-soft)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.transform = 'none';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
+            className={`birthday-item${b.isToday ? ' birthday-item--today' : ''}`}
           >
             <div style={{ flexShrink: 0 }}>
-              <AvatarSVG avatarType={b.profile.avatar} size={64} border="1.5px solid var(--forest-green)" />
+              <AvatarSVG
+                avatarType={b.profile.avatar}
+                size={48}
+                border={b.isToday ? '2px solid var(--campfire-amber)' : '2px solid var(--forest-green-light)'}
+              />
             </div>
-            
-            <div style={{ flexGrow: 1 }}>
-              <div style={{ fontWeight: '600', fontSize: '1.05rem', color: 'var(--text-main)', lineHeight: '1.2' }}>
-                {b.profile.full_name}
-              </div>
-              <div style={{ 
-                fontSize: '0.85rem', 
-                color: b.isToday ? 'var(--campfire-amber)' : 'var(--text-muted)', 
-                fontWeight: b.isToday ? 'bold' : 'normal',
-                marginTop: '4px'
-              }}>
+
+            <div className="birthday-info">
+              <div className="birthday-name">{b.profile.full_name}</div>
+              <div
+                className="birthday-date"
+                style={{ color: b.isToday ? 'var(--campfire-amber)' : undefined, fontWeight: b.isToday ? 'bold' : undefined }}
+              >
                 {b.isToday ? 'היום! 🎉 🥳' : `בעוד ${b.daysLeft} ימים (${b.dateStr})`}
               </div>
             </div>
+
+            {b.isToday && <span className="birthday-emoji">🎂</span>}
           </div>
         ))}
       </div>

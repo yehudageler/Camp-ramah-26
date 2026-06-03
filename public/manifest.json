@@ -1,0 +1,41 @@
+{
+  "name": "קמפ רמה 2026",
+  "short_name": "Camp Ramah",
+  "description": "The official Camp Ramah 2026 counselor app – packing list, community wall, daily photos, and more.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fdfbf7",
+  "theme_color": "#1e4620",
+  "orientation": "portrait-primary",
+  "lang": "he",
+  "dir": "rtl",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "categories": ["utilities", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "רשימת אריזה",
+      "url": "/#packing",
+      "description": "פתח את רשימת האריזה"
+    },
+    {
+      "name": "קהילה",
+      "url": "/#community",
+      "description": "קהילת השליחים"
+    }
+  ]
+}

@@ -1,0 +1,166 @@
+/* ==========================================
+   REGISTRATION SCREEN
+   ========================================== */
+.reg-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 85vh;
+  padding: 1rem;
+}
+
+.reg-card {
+  background: var(--white-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 3rem 2.5rem;
+  width: 100%;
+  max-width: 520px;
+  border: 1.5px solid rgba(30, 70, 32, 0.15);
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.reg-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(90deg, var(--forest-green), var(--campfire-amber), var(--lake-blue));
+}
+
+.reg-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.reg-logo {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  animation: float 4s ease-in-out infinite;
+  display: inline-block;
+}
+
+.reg-title {
+  color: var(--forest-green);
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.reg-subtitle {
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-family: 'Fredoka', cursive;
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-main);
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 1rem;
+  outline: none;
+  transition: var(--transition);
+  background-color: #fafbf9;
+}
+
+.form-input:focus {
+  border-color: var(--forest-green);
+  background-color: var(--white-card);
+  box-shadow: 0 0 0 4px rgba(30, 70, 32, 0.1);
+}
+
+/* Avatar Selection */
+.avatar-selection {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.avatar-option {
+  border: 3px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 4px;
+  transition: var(--transition);
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f7fafc;
+}
+
+.avatar-option img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.avatar-option.selected {
+  border-color: var(--forest-green);
+  background-color: var(--forest-green-light);
+  transform: scale(1.1);
+}
+
+/* Date Picker */
+.date-input-wrapper {
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.date-picker-input {
+  padding-right: 2.8rem !important;
+  cursor: pointer;
+  position: relative;
+}
+
+.date-picker-input::-webkit-calendar-picker-indicator {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: auto;
+  height: auto;
+  background: transparent;
+  color: transparent;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.date-input-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--forest-green);
+  pointer-events: none;
+  transition: var(--transition);
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+}
+
+.date-picker-input:focus+.date-input-icon {
+  color: var(--campfire-amber);
+}
