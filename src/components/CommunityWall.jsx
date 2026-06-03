@@ -5,19 +5,13 @@ const mockCounselors = [];
 
 export default function CommunityWall({ currentUser, databaseProfiles, packingProgress }) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [shuffledIds, setShuffledIds] = useState([]);
+  const [displayCount, setDisplayCount] = useState(20);
+  const [viewMode, setViewMode] = useState("grid");
 
+  // Reset pagination when searching
   useEffect(() => {
-    if (databaseProfiles && databaseProfiles.length > 0) {
-      const ids = databaseProfiles.map(p => p.id);
-      // Fisher-Yates shuffle
-      for (let i = ids.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [ids[i], ids[j]] = [ids[j], ids[i]];
-      }
-      setShuffledIds(ids);
-    }
-  }, [databaseProfiles]);
+    setDisplayCount(20);
+  }, [searchQuery]);
 
   const allCounselors = [];
 
@@ -68,17 +62,12 @@ export default function CommunityWall({ currentUser, databaseProfiles, packingPr
     }
   });
 
-  // Sort by the shuffled order if available
-  if (shuffledIds.length > 0) {
-    uniqueCounselors.sort((a, b) => {
-      const indexA = shuffledIds.indexOf(a.id);
-      const indexB = shuffledIds.indexOf(b.id);
-      if (indexA === -1 && indexB === -1) return 0;
-      if (indexA === -1) return 1;
-      if (indexB === -1) return -1;
-      return indexA - indexB;
-    });
-  }
+  // Sort alphabetically by name (current user first)
+  uniqueCounselors.sort((a, b) => {
+    if (a.isCurrentUser && !b.isCurrentUser) return -1;
+    if (!a.isCurrentUser && b.isCurrentUser) return 1;
+    return a.name.localeCompare(b.name, 'he');
+  });
 
   // Filter based on search query
   const filteredCounselors = uniqueCounselors.filter(c => {
@@ -86,27 +75,51 @@ export default function CommunityWall({ currentUser, databaseProfiles, packingPr
     return text.includes(searchQuery.toLowerCase());
   });
 
+  // Pagination logic
+  const displayedCounselors = filteredCounselors.slice(0, displayCount);
+  const hasMore = displayCount < filteredCounselors.length;
+
   return (
     <section className="community-section">
       <div className="section-header">
         <h2 className="section-title">
           <span>👥</span> קיר השליחים של וויסקונסין
         </h2>
-        <div className="search-box">
-          <input 
-            type="text" 
-            className="search-input" 
-            placeholder="חפשו שליחים לפי שם או תפקיד..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <span className="search-icon">🔍</span>
+        
+        <div className="header-actions">
+          <div className="view-toggle">
+            <button 
+              className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+              onClick={() => setViewMode('grid')}
+              title="תצוגת כרטיסיות"
+            >
+              ▦
+            </button>
+            <button 
+              className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+              onClick={() => setViewMode('list')}
+              title="תצוגת רשימה"
+            >
+              ☰
+            </button>
+          </div>
+
+          <div className="search-box">
+            <input 
+              type="text" 
+              className="search-input" 
+              placeholder="חפשו שליחים לפי שם או תפקיד..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <span className="search-icon">🔍</span>
+          </div>
         </div>
       </div>
 
-      <div className="community-grid">
-        {filteredCounselors.map((c, i) => (
-          <CounselorCard key={c.id || c.name || i} counselor={c} />
+      <div className={viewMode === 'grid' ? "community-grid" : "community-list"}>
+        {displayedCounselors.map((c, i) => (
+          <CounselorCard key={c.id || c.name || i} counselor={c} mode={viewMode} />
         ))}
         {filteredCounselors.length === 0 && (
           <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
@@ -114,6 +127,18 @@ export default function CommunityWall({ currentUser, databaseProfiles, packingPr
           </div>
         )}
       </div>
+      
+      {hasMore && (
+        <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+          <button 
+            className="btn-primary" 
+            style={{ width: 'auto', padding: '0.8rem 2.5rem', borderRadius: '30px' }}
+            onClick={() => setDisplayCount(prev => prev + 20)}
+          >
+            הצג עוד שליחים 👇
+          </button>
+        </div>
+      )}
     </section>
   );
 }

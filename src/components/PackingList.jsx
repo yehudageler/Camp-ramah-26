@@ -59,32 +59,29 @@ export default function PackingList({ checkedStates, customItems, onToggleItem, 
           {listItems.map((item) => {
             const isChecked = !!checkedStates[item.id];
             return (
-              <div
-                key={item.id}
-                className={`check-item ${isChecked ? 'checked' : ''} ${isWarning ? 'warning-item' : ''}`}
-                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}
-                onClick={() => !isWarning && onToggleItem(item.id)}
-              >
                 <div
-                  style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexGrow: 1 }}
+                  key={item.id}
+                  className={`check-item ${isChecked ? 'checked' : ''} ${isWarning ? 'warning-item' : ''}`}
+                  onClick={() => !isWarning && onToggleItem(item.id)}
                 >
-                  <div className="custom-checkbox"></div>
-                  <span className="check-item-text">{item.text}</span>
-                </div>
+                  <div className="check-item-content">
+                    <div className="custom-checkbox"></div>
+                    <span className="check-item-text">{item.text}</span>
+                  </div>
 
-                {!isWarning && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDeleteItem(item.id);
-                    }}
-                    className="delete-item-btn"
-                    title="מחק פריט ✕"
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
+                  {!isWarning && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteItem(item.id);
+                      }}
+                      className="delete-item-btn"
+                      title="מחק פריט ✕"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
             );
           })}
           {listItems.length === 0 && (
