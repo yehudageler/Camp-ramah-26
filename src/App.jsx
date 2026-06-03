@@ -87,6 +87,12 @@ export default function App() {
   useEffect(() => {
     const initApp = async () => {
       try {
+        // Hydrate currentUser from localStorage immediately for fast load
+        const storedUser = localStorage.getItem("ramah_user");
+        if (storedUser) {
+          setCurrentUser(JSON.parse(storedUser));
+        }
+
         if (isSupabaseActive) {
           const { data: { session } } = await supabase.auth.getSession();
           if (session) {
@@ -106,14 +112,16 @@ export default function App() {
               birthday: profile?.birthday
             };
             setCurrentUser(user);
+            localStorage.setItem("ramah_user", JSON.stringify(user));
             await syncData(user);
+          } else {
+            // No active session in Supabase, clear cached local user
+            setCurrentUser(null);
+            localStorage.removeItem("ramah_user");
           }
         } else {
           // Local storage fallback loading
-          const storedUser = localStorage.getItem("ramah_user");
-          if (storedUser) {
-            setCurrentUser(JSON.parse(storedUser));
-          }
+          // storedUser check already handled above for fast render
           
           const storedChecked = localStorage.getItem("ramah_checked_states");
           if (storedChecked) {
@@ -157,6 +165,7 @@ export default function App() {
 
   const handleAuthSuccess = async (user) => {
     setCurrentUser(user);
+    localStorage.setItem("ramah_user", JSON.stringify(user));
     if (isSupabaseActive) {
       await syncData(user);
     } else {
@@ -166,7 +175,7 @@ export default function App() {
       
       const storedCustom = localStorage.getItem("ramah_custom_items");
       if (storedCustom) setCustomItems(JSON.parse(storedCustom));
-
+ 
       const storedSuggestions = localStorage.getItem("ramah_suggestions");
       if (storedSuggestions) setSuggestions(JSON.parse(storedSuggestions));
     }

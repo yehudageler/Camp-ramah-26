@@ -13,7 +13,13 @@ if (
   SUPABASE_ANON_KEY !== "YOUR_SUPABASE_ANON_KEY_HERE"
 ) {
   try {
-    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    });
     isSupabaseActive = true;
     console.log("Supabase client initialized successfully!");
   } catch (e) {
