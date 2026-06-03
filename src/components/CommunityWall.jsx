@@ -5,12 +5,12 @@ const mockCounselors = [];
 
 export default function CommunityWall({ currentUser, databaseProfiles, packingProgress }) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [displayCount, setDisplayCount] = useState(20);
+  const [displayCount, setDisplayCount] = useState(10);
   const [viewMode, setViewMode] = useState("grid");
 
   // Reset pagination when searching
   useEffect(() => {
-    setDisplayCount(20);
+    setDisplayCount(10);
   }, [searchQuery]);
 
   const allCounselors = [];
@@ -133,7 +133,7 @@ export default function CommunityWall({ currentUser, databaseProfiles, packingPr
           <button 
             className="btn-primary" 
             style={{ width: 'auto', padding: '0.8rem 2.5rem', borderRadius: '30px' }}
-            onClick={() => setDisplayCount(prev => prev + 20)}
+            onClick={() => setDisplayCount(prev => prev + 10)}
           >
             הצג עוד שליחים 👇
           </button>

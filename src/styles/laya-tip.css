@@ -1,0 +1,55 @@
+/* ==========================================
+   LAYA TIP CARD
+   ========================================== */
+.laya-tip-card {
+  margin-top: 2rem;
+  margin-bottom: 2.5rem;
+  padding: 1.5rem;
+  background-color: var(--white-card);
+  border-radius: var(--radius-md);
+  border: 1.5px solid rgba(30, 70, 32, 0.15);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  direction: rtl;
+}
+
+.laya-tip-img {
+  width: 100px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.laya-tip-content {
+  flex: 1 1 280px;
+  text-align: right;
+}
+
+.laya-tip-title {
+  color: var(--forest-green);
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-family: 'Fredoka', sans-serif;
+}
+
+.laya-tip-link {
+  color: var(--campfire-amber);
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s;
+}
+
+.laya-tip-link:hover {
+  color: var(--campfire-amber-hover);
+}
