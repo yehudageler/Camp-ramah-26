@@ -23,6 +23,7 @@
 
 /* 7. Suggestions, daily photo gallery & Laya tip */
 @import './styles/suggestions.css';
+@import './styles/daily-photo.css';
 
 /* 8. Modal windows */
 @import './styles/modal.css';

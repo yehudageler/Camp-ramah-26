@@ -9,6 +9,7 @@ import LayaTip from './components/LayaTip';
 import { processImage } from './lib/imageUtils';
 import { defaultPackingList } from './constants/packingList';
 import Suggestions from './components/Suggestions';
+import DailyPhoto from './components/DailyPhoto';
 import AdminPanel from './components/AdminPanel';
 import ConfessionsCorner from './components/ConfessionsCorner';
 import BirthdaysCorner from './components/BirthdaysCorner';
@@ -718,12 +719,17 @@ export default function App() {
           {/* <ConfessionsCorner currentUser={currentUser} /> */}
 
           <div id="gallery" style={{ scrollMarginTop: '60px' }}>
-            <Suggestions 
+            <DailyPhoto 
               isAdmin={currentUser.email === 'geleryehuda@gmail.com'}
               dailyPhotos={dailyPhotos}
               onUploadPhoto={handleUploadPhoto}
               onDeletePhoto={handleDeletePhoto}
               onUpdatePhotoCaption={handleUpdatePhotoCaption}
+            />
+          </div>
+
+          <div id="suggestions" style={{ scrollMarginTop: '60px' }}>
+            <Suggestions 
               onSubmitSuggestion={handleSubmitSuggestion}
             />
           </div>

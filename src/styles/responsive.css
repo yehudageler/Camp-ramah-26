@@ -166,16 +166,12 @@
 
 /* ---- Suggestions ---- */
 @media (max-width: 768px) {
-  .suggestions-section {
-    grid-template-columns: 1fr;
-  }
-
   .confessions-grid {
     grid-template-columns: 1fr;
   }
 }
 
-/* ---- Lightbox ---- */
+/* ---- Daily Photo & Lightbox ---- */
 @media (max-width: 768px) {
   .lightbox-nav-btn {
     width: 40px;
