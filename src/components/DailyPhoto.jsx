@@ -311,20 +311,22 @@ export default function DailyPhoto({
             ✕
           </button>
 
-          {/* Nav – Prev (Older) */}
-          <button
-            onClick={(e) => { e.stopPropagation(); handlePrevPhoto(); }}
-            disabled={currentIndex === dailyPhotos.length - 1}
-            className="lightbox-nav-btn"
-            style={{ position: 'absolute', left: '30px', zIndex: 10000, opacity: currentIndex === dailyPhotos.length - 1 ? 0.3 : 1 }}
-          >‹</button>
-
-          {/* Nav – Next (Newer) */}
+          {/* Nav – Next (Newer / Future) on Left */}
           <button
             onClick={(e) => { e.stopPropagation(); handleNextPhoto(); }}
             disabled={currentIndex === 0}
             className="lightbox-nav-btn"
-            style={{ position: 'absolute', right: '30px', zIndex: 10000, opacity: currentIndex === 0 ? 0.3 : 1 }}
+            style={{ position: 'absolute', left: '30px', zIndex: 10000, opacity: currentIndex === 0 ? 0.3 : 1 }}
+            title="חדשות יותר (←)"
+          >‹</button>
+
+          {/* Nav – Prev (Older / Past) on Right */}
+          <button
+            onClick={(e) => { e.stopPropagation(); handlePrevPhoto(); }}
+            disabled={currentIndex === dailyPhotos.length - 1}
+            className="lightbox-nav-btn"
+            style={{ position: 'absolute', right: '30px', zIndex: 10000, opacity: currentIndex === dailyPhotos.length - 1 ? 0.3 : 1 }}
+            title="ישנות יותר (→)"
           >›</button>
 
           {/* Lightbox Content Wrapper */}
