@@ -26,26 +26,26 @@ export default function DailyPhoto({
     setEditedCaption(dailyPhotos[currentIndex]?.caption || "");
   }, [currentIndex, dailyPhotos]);
 
-  // Keyboard navigation for lightbox
+  // Keyboard navigation for lightbox (RTL: ArrowRight = older/past, ArrowLeft = newer/future)
   useEffect(() => {
     if (!isLightboxOpen) return;
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') setIsLightboxOpen(false);
-      else if (e.key === 'ArrowRight' && currentIndex > 0) setCurrentIndex(currentIndex - 1);
-      else if (e.key === 'ArrowLeft' && currentIndex < dailyPhotos.length - 1) setCurrentIndex(currentIndex + 1);
+      else if (e.key === 'ArrowRight' && currentIndex < dailyPhotos.length - 1) setCurrentIndex(currentIndex + 1);
+      else if (e.key === 'ArrowLeft' && currentIndex > 0) setCurrentIndex(currentIndex - 1);
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isLightboxOpen, currentIndex, dailyPhotos.length]);
 
-  // Swipe for gallery and lightbox (RTL: swipe left = older, swipe right = newer)
+  // Swipe for gallery and lightbox (RTL: swipe left = newer/future, swipe right = older/past)
   const gallerySwipe = useSwipe({
-    onSwipeLeft: () => { if (currentIndex < dailyPhotos.length - 1) setCurrentIndex(currentIndex + 1); },
-    onSwipeRight: () => { if (currentIndex > 0) setCurrentIndex(currentIndex - 1); },
+    onSwipeLeft: () => { if (currentIndex > 0) setCurrentIndex(currentIndex - 1); },
+    onSwipeRight: () => { if (currentIndex < dailyPhotos.length - 1) setCurrentIndex(currentIndex + 1); },
   });
   const lightboxSwipe = useSwipe({
-    onSwipeLeft: () => { if (currentIndex < dailyPhotos.length - 1) setCurrentIndex(currentIndex + 1); },
-    onSwipeRight: () => { if (currentIndex > 0) setCurrentIndex(currentIndex - 1); },
+    onSwipeLeft: () => { if (currentIndex > 0) setCurrentIndex(currentIndex - 1); },
+    onSwipeRight: () => { if (currentIndex < dailyPhotos.length - 1) setCurrentIndex(currentIndex + 1); },
   });
 
   const handleSaveCaption = async (e) => {
@@ -311,22 +311,20 @@ export default function DailyPhoto({
             ✕
           </button>
 
-          {/* Nav – Next (Newer / Future) on Left */}
+          {/* Nav – Next (Newer) - on the left */}
           <button
             onClick={(e) => { e.stopPropagation(); handleNextPhoto(); }}
             disabled={currentIndex === 0}
             className="lightbox-nav-btn"
             style={{ position: 'absolute', left: '30px', zIndex: 10000, opacity: currentIndex === 0 ? 0.3 : 1 }}
-            title="חדשות יותר (←)"
           >‹</button>
 
-          {/* Nav – Prev (Older / Past) on Right */}
+          {/* Nav – Prev (Older) - on the right */}
           <button
             onClick={(e) => { e.stopPropagation(); handlePrevPhoto(); }}
             disabled={currentIndex === dailyPhotos.length - 1}
             className="lightbox-nav-btn"
             style={{ position: 'absolute', right: '30px', zIndex: 10000, opacity: currentIndex === dailyPhotos.length - 1 ? 0.3 : 1 }}
-            title="ישנות יותר (→)"
           >›</button>
 
           {/* Lightbox Content Wrapper */}
