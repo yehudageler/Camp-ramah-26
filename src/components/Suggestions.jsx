@@ -375,31 +375,31 @@ export default function Suggestions({
 
           {/* Image Container */}
           <div
-            style={{ position: 'relative', maxWidth: '90%', maxHeight: '80%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+            style={{ maxWidth: '90%', maxHeight: '70vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
             onClick={(e) => e.stopPropagation()}
           >
             <img
               src={dailyPhotos[currentIndex].image_data}
               alt={dailyPhotos[currentIndex].caption || "תמונה יומית"}
-              style={{ maxWidth: '100%', maxHeight: '80vh', objectFit: 'contain', borderRadius: 'var(--radius-md)', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }}
+              style={{ maxWidth: '100%', maxHeight: '68vh', objectFit: 'contain', borderRadius: 'var(--radius-md)', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }}
             />
+          </div>
 
-            {/* Frosted Glass Caption */}
-            <div className="lightbox-caption-overlay">
-              {dailyPhotos[currentIndex].caption ? (
-                <h4 style={{ fontFamily: "'Fredoka', cursive", fontWeight: '500', fontSize: '1.25rem', margin: '0 0 0.4rem 0', color: '#fff', lineHeight: '1.4' }}>
-                  {dailyPhotos[currentIndex].caption}
-                </h4>
-              ) : (
-                <h4 style={{ fontFamily: "'Fredoka', cursive", fontWeight: '400', fontSize: '1rem', margin: '0 0 0.4rem 0', color: 'rgba(255,255,255,0.6)', fontStyle: 'italic' }}>
-                  אין כיתוב לתמונה זו
-                </h4>
-              )}
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)' }}>
-                <span>📅 הועלה ב-{new Date(dailyPhotos[currentIndex].created_at).toLocaleDateString("he-IL")}</span>
-                <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
-                <span>תמונה {currentIndex + 1} מתוך {dailyPhotos.length}</span>
-              </div>
+          {/* Frosted Glass Caption */}
+          <div className="lightbox-caption-overlay" onClick={(e) => e.stopPropagation()}>
+            {dailyPhotos[currentIndex].caption ? (
+              <h4 className="lightbox-caption-title">
+                {dailyPhotos[currentIndex].caption}
+              </h4>
+            ) : (
+              <h4 className="lightbox-caption-title empty">
+                אין כיתוב לתמונה זו
+              </h4>
+            )}
+            <div className="lightbox-caption-meta">
+              <span>📅 הועלה ב-{new Date(dailyPhotos[currentIndex].created_at).toLocaleDateString("he-IL")}</span>
+              <span className="lightbox-caption-separator">|</span>
+              <span>תמונה {currentIndex + 1} מתוך {dailyPhotos.length}</span>
             </div>
           </div>
         </div>

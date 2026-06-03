@@ -395,6 +395,35 @@
   direction: rtl;
 }
 
+.lightbox-caption-title {
+  font-family: 'Fredoka', cursive;
+  font-weight: 500;
+  font-size: 1.25rem;
+  margin: 0 0 0.4rem 0;
+  color: #fff;
+  line-height: 1.4;
+}
+
+.lightbox-caption-title.empty {
+  font-weight: 400;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+}
+
+.lightbox-caption-meta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.lightbox-caption-separator {
+  color: rgba(255, 255, 255, 0.3);
+}
+
 /* ==========================================
    LAYA TIP CARD
    ========================================== */
