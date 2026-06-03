@@ -115,7 +115,7 @@ export default function DailyPhoto({
   };
 
   return (
-    <section className="daily-photo-section">
+    <>
       <div className="gallery-card">
         <h3>
           <span>📸</span> פינת התמונה היומית
@@ -391,6 +391,6 @@ export default function DailyPhoto({
           </div>
         </div>
       )}
-    </section>
+    </>
   );
 }

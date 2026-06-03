@@ -718,21 +718,23 @@ export default function App() {
 
           {/* <ConfessionsCorner currentUser={currentUser} /> */}
 
-          <div id="gallery" style={{ scrollMarginTop: '60px' }}>
-            <DailyPhoto 
-              isAdmin={currentUser.email === 'geleryehuda@gmail.com'}
-              dailyPhotos={dailyPhotos}
-              onUploadPhoto={handleUploadPhoto}
-              onDeletePhoto={handleDeletePhoto}
-              onUpdatePhotoCaption={handleUpdatePhotoCaption}
-            />
-          </div>
+          <section className="suggestions-section">
+            <div id="gallery" style={{ scrollMarginTop: '60px' }}>
+              <DailyPhoto 
+                isAdmin={currentUser.email === 'geleryehuda@gmail.com'}
+                dailyPhotos={dailyPhotos}
+                onUploadPhoto={handleUploadPhoto}
+                onDeletePhoto={handleDeletePhoto}
+                onUpdatePhotoCaption={handleUpdatePhotoCaption}
+              />
+            </div>
 
-          <div id="suggestions" style={{ scrollMarginTop: '60px' }}>
-            <Suggestions 
-              onSubmitSuggestion={handleSubmitSuggestion}
-            />
-          </div>
+            <div id="suggestions" style={{ scrollMarginTop: '60px' }}>
+              <Suggestions 
+                onSubmitSuggestion={handleSubmitSuggestion}
+              />
+            </div>
+          </section>
         </main>
       )}
 

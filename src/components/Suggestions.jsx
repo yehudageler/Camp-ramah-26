@@ -16,8 +16,7 @@ export default function Suggestions({
   };
 
   return (
-    <section className="suggestions-section">
-      <div id="suggestions" className="feedback-section">
+    <div id="suggestions" className="feedback-section">
         <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <span>💡</span> בואו נבנה את זה ביחד!
         </h3>
@@ -43,7 +42,6 @@ export default function Suggestions({
             תודה! ההצעה שלך נשלחה ישירות ליהודה 📬
           </div>
         )}
-      </div>
-    </section>
+    </div>
   );
 }
