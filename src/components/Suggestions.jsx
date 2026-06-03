@@ -18,6 +18,7 @@ export default function Suggestions({
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   const [isEditingCaption, setIsEditingCaption] = useState(false);
   const [editedCaption, setEditedCaption] = useState("");
@@ -26,6 +27,27 @@ export default function Suggestions({
     setIsEditingCaption(false);
     setEditedCaption(dailyPhotos[currentIndex]?.caption || "");
   }, [currentIndex, dailyPhotos]);
+
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsLightboxOpen(false);
+      } else if (e.key === 'ArrowRight') {
+        if (currentIndex > 0) {
+          setCurrentIndex(currentIndex - 1);
+        }
+      } else if (e.key === 'ArrowLeft') {
+        if (currentIndex < dailyPhotos.length - 1) {
+          setCurrentIndex(currentIndex + 1);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isLightboxOpen, currentIndex, dailyPhotos.length]);
 
   const handleSaveCaption = async (e) => {
     e.preventDefault();
@@ -173,6 +195,8 @@ export default function Suggestions({
                   }}
                   onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.01)'}
                   onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                  onClick={() => setIsLightboxOpen(true)}
+                  title="לחצו להגדלה במסך מלא 🔍"
                 />
 
                 {/* Caption Area */}
@@ -503,6 +527,178 @@ export default function Suggestions({
           </div>
         )}
       </div>
+
+      {/* Lightbox Modal */}
+      {isLightboxOpen && dailyPhotos.length > 0 && (
+        <div 
+          className="lightbox-overlay"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            zIndex: 9999,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+          onClick={() => setIsLightboxOpen(false)}
+        >
+          {/* Close button */}
+          <button 
+            onClick={() => setIsLightboxOpen(false)}
+            style={{
+              position: 'absolute',
+              top: '20px',
+              right: '20px',
+              background: 'rgba(255, 255, 255, 0.12)',
+              border: 'none',
+              borderRadius: '50%',
+              width: '44px',
+              height: '44px',
+              color: '#fff',
+              fontSize: '1.5rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'var(--transition)',
+              zIndex: 10001
+            }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.25)'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.12)'}
+            title="סגור (Esc)"
+          >
+            ✕
+          </button>
+
+          {/* Navigation - Prev (Older) */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handlePrevPhoto();
+            }}
+            disabled={currentIndex === dailyPhotos.length - 1}
+            className="lightbox-nav-btn"
+            style={{
+              position: 'absolute',
+              left: '30px',
+              zIndex: 10000,
+              opacity: currentIndex === dailyPhotos.length - 1 ? 0.3 : 1
+            }}
+            title="תמונה קודמת (חץ שמאלה)"
+          >
+            ‹
+          </button>
+
+          {/* Navigation - Next (Newer) */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleNextPhoto();
+            }}
+            disabled={currentIndex === 0}
+            className="lightbox-nav-btn"
+            style={{
+              position: 'absolute',
+              right: '30px',
+              zIndex: 10000,
+              opacity: currentIndex === 0 ? 0.3 : 1
+            }}
+            title="תמונה הבאה (חץ ימינה)"
+          >
+            ›
+          </button>
+
+          {/* Centered Image Container */}
+          <div 
+            style={{
+              position: 'relative',
+              maxWidth: '90%',
+              maxHeight: '80%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img 
+              src={dailyPhotos[currentIndex].image_data} 
+              alt={dailyPhotos[currentIndex].caption || "תמונה יומית"} 
+              style={{
+                maxWidth: '100%',
+                maxHeight: '80vh',
+                objectFit: 'contain',
+                borderRadius: 'var(--radius-md)',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+              }}
+            />
+
+            {/* Frosted Glass Caption Overlay */}
+            <div 
+              style={{
+                position: 'absolute',
+                bottom: '20px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: 'calc(100% - 40px)',
+                maxWidth: '600px',
+                background: 'rgba(15, 23, 42, 0.65)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                borderRadius: 'var(--radius-md)',
+                padding: '1rem 1.5rem',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                color: '#fff',
+                textAlign: 'center',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                direction: 'rtl'
+              }}
+            >
+              {dailyPhotos[currentIndex].caption ? (
+                <h4 style={{ 
+                  fontFamily: "'Fredoka', cursive",
+                  fontWeight: '500', 
+                  fontSize: '1.25rem', 
+                  margin: '0 0 0.4rem 0',
+                  color: '#fff',
+                  lineHeight: '1.4'
+                }}>
+                  {dailyPhotos[currentIndex].caption}
+                </h4>
+              ) : (
+                <h4 style={{ 
+                  fontFamily: "'Fredoka', cursive",
+                  fontWeight: '400', 
+                  fontSize: '1rem', 
+                  margin: '0 0 0.4rem 0',
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  fontStyle: 'italic'
+                }}>
+                  אין כיתוב לתמונה זו
+                </h4>
+              )}
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                gap: '1rem',
+                fontSize: '0.8rem',
+                color: 'rgba(255, 255, 255, 0.7)'
+              }}>
+                <span>📅 הועלה ב-{new Date(dailyPhotos[currentIndex].created_at).toLocaleDateString("he-IL")}</span>
+                <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
+                <span>תמונה {currentIndex + 1} מתוך {dailyPhotos.length}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
