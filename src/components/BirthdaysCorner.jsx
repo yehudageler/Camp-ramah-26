@@ -49,7 +49,7 @@ export default function BirthdaysCorner({ databaseProfiles = [], currentUser = n
     })
     .filter(Boolean)
     .sort((a, b) => a.daysLeft - b.daysLeft)
-    .slice(0, 3); // Get top 3
+    .slice(0, 2); // Get top 2
 
   if (upcomingBirthdays.length === 0) {
     return (
@@ -82,26 +82,25 @@ export default function BirthdaysCorner({ databaseProfiles = [], currentUser = n
       style={{
         background: 'var(--white-card)',
         borderRadius: 'var(--radius-lg)',
-        padding: '1.8rem 1.5rem',
+        padding: '1.2rem 1rem',
         boxShadow: 'var(--shadow-soft)',
         border: '1.5px solid rgba(230, 81, 0, 0.18)',
         direction: 'rtl',
         display: 'flex',
         flexDirection: 'column',
-        gap: '1rem',
-        height: '100%'
+        gap: '0.8rem',
+        height: 'auto'
       }}
     >
       <h3 style={{ 
         color: 'var(--forest-green)', 
         display: 'flex', 
         alignItems: 'center', 
-        gap: '0.6rem', 
+        gap: '0.5rem', 
         margin: 0,
-        marginBottom: '0.5rem',
-        fontSize: '1.3rem'
+        fontSize: '1.15rem'
       }}>
-        <span style={{ fontSize: '1.6rem' }}>🎂</span> ימי הולדת קרובים
+        <span style={{ fontSize: '1.4rem' }}>🎂</span> ימי הולדת קרובים
       </h3>
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', flexGrow: 1, justifyContent: 'center' }}>
@@ -111,8 +110,8 @@ export default function BirthdaysCorner({ databaseProfiles = [], currentUser = n
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '1rem',
-              padding: '0.8rem',
+              gap: '0.8rem',
+              padding: '0.8rem 1rem',
               background: b.isToday ? 'linear-gradient(135deg, var(--campfire-light), #fff9c4)' : '#f8fafc',
               border: b.isToday ? '1.5px solid var(--campfire-amber)' : '1px solid #edf2f7',
               borderRadius: 'var(--radius-md)',
@@ -129,11 +128,11 @@ export default function BirthdaysCorner({ databaseProfiles = [], currentUser = n
             }}
           >
             <div style={{ flexShrink: 0 }}>
-              <AvatarSVG avatarType={b.profile.avatar} size={48} border="1.5px solid var(--forest-green)" />
+              <AvatarSVG avatarType={b.profile.avatar} size={64} border="1.5px solid var(--forest-green)" />
             </div>
             
             <div style={{ flexGrow: 1 }}>
-              <div style={{ fontWeight: '600', fontSize: '1rem', color: 'var(--text-main)', lineHeight: '1.2' }}>
+              <div style={{ fontWeight: '600', fontSize: '1.05rem', color: 'var(--text-main)', lineHeight: '1.2' }}>
                 {b.profile.full_name}
               </div>
               <div style={{ 

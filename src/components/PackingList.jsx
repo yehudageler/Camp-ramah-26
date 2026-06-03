@@ -46,10 +46,10 @@ export default function PackingList({ checkedStates, customItems, onToggleItem, 
       {/* Category Tabs */}
       <nav className="packing-tabs" role="tablist">
         <button className={`tab-btn ${currentTab === 'clothing' ? 'active' : ''}`} onClick={() => setCurrentTab('clothing')}>👚 בגדים</button>
-        <button className={`tab-btn ${currentTab === 'wearables' ? 'active' : ''}`} onClick={() => setCurrentTab('wearables')}>👟 פרטי לבוש ונעליים</button>
+        <button className={`tab-btn ${currentTab === 'wearables' ? 'active' : ''}`} onClick={() => setCurrentTab('wearables')}>👟 לבוש ונעליים</button>
         <button className={`tab-btn ${currentTab === 'miscellaneous' ? 'active' : ''}`} onClick={() => setCurrentTab('miscellaneous')}>🧭 שונות</button>
-        <button className={`tab-btn ${currentTab === 'niceToHave' ? 'active' : ''}`} onClick={() => setCurrentTab('niceToHave')}>☕ נחמד שיש (לא חובה)</button>
-        <button className={`tab-btn ${currentTab === 'custom' ? 'active' : ''}`} onClick={() => setCurrentTab('custom')}>➕ ציוד אישי שלי</button>
+        <button className={`tab-btn ${currentTab === 'niceToHave' ? 'active' : ''}`} onClick={() => setCurrentTab('niceToHave')}>☕ נחמד שיש</button>
+        <button className={`tab-btn ${currentTab === 'custom' ? 'active' : ''}`} onClick={() => setCurrentTab('custom')}>➕ ציוד אישי</button>
         <button className={`tab-btn ${currentTab === 'warning' ? 'active' : ''}`} style={{ backgroundColor: 'var(--red-light)', color: 'var(--red-warning)' }} onClick={() => setCurrentTab('warning')}>🚫 מה לא להביא!</button>
       </nav>
 
@@ -85,7 +85,7 @@ export default function PackingList({ checkedStates, customItems, onToggleItem, 
             );
           })}
           {listItems.length === 0 && (
-            <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+            <div style={{ columnSpan: 'all', breakInside: 'avoid', textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
               אין פריטים ברשימה זו עדיין. {currentTab === "custom" ? "הוסיפו פריט משלכם למטה!" : ""}
             </div>
           )}
