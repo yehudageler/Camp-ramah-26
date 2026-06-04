@@ -26,13 +26,38 @@ export default function DailyPhoto({
     setEditedCaption(dailyPhotos[currentIndex]?.caption || "");
   }, [currentIndex, dailyPhotos]);
 
+  // Preload neighboring and initial images for instant navigation
+  useEffect(() => {
+    if (!dailyPhotos || dailyPhotos.length === 0) return;
+
+    // Preload first few photos and the ones neighboring the current index
+    const indicesToPreload = new Set([
+      0, // Today's photo
+      1, // Yesterday's photo
+      2, // Day before yesterday's photo
+      currentIndex - 1,
+      currentIndex,
+      currentIndex + 1
+    ]);
+
+    indicesToPreload.forEach(idx => {
+      if (idx >= 0 && idx < dailyPhotos.length) {
+        const imgUrl = dailyPhotos[idx]?.image_data;
+        if (imgUrl) {
+          const img = new Image();
+          img.src = imgUrl;
+        }
+      }
+    });
+  }, [currentIndex, dailyPhotos]);
+
   // Keyboard navigation for lightbox (RTL: ArrowRight = older/past, ArrowLeft = newer/future)
   useEffect(() => {
     if (!isLightboxOpen) return;
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') setIsLightboxOpen(false);
-      else if (e.key === 'ArrowRight' && currentIndex < dailyPhotos.length - 1) setCurrentIndex(currentIndex + 1);
-      else if (e.key === 'ArrowLeft' && currentIndex > 0) setCurrentIndex(currentIndex - 1);
+      else if (e.key === 'ArrowRight' && currentIndex > 0) setCurrentIndex(currentIndex - 1);
+      else if (e.key === 'ArrowLeft' && currentIndex < dailyPhotos.length - 1) setCurrentIndex(currentIndex + 1);
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
@@ -313,21 +338,21 @@ export default function DailyPhoto({
             ✕
           </button>
 
-          {/* Nav – Next (Newer) - on the left */}
-          <button
-            onClick={(e) => { e.stopPropagation(); handleNextPhoto(); }}
-            disabled={currentIndex === 0}
-            className="lightbox-nav-btn"
-            style={{ position: 'absolute', left: '30px', zIndex: 10000, opacity: currentIndex === 0 ? 0.3 : 1 }}
-          >›</button>
-
-          {/* Nav – Prev (Older) - on the right */}
+          {/* Nav – Next (Older) - on the left */}
           <button
             onClick={(e) => { e.stopPropagation(); handlePrevPhoto(); }}
             disabled={currentIndex === dailyPhotos.length - 1}
             className="lightbox-nav-btn"
-            style={{ position: 'absolute', right: '30px', zIndex: 10000, opacity: currentIndex === dailyPhotos.length - 1 ? 0.3 : 1 }}
+            style={{ position: 'absolute', left: '30px', zIndex: 10000, opacity: currentIndex === dailyPhotos.length - 1 ? 0.3 : 1 }}
           >‹</button>
+
+          {/* Nav – Prev (Newer) - on the right */}
+          <button
+            onClick={(e) => { e.stopPropagation(); handleNextPhoto(); }}
+            disabled={currentIndex === 0}
+            className="lightbox-nav-btn"
+            style={{ position: 'absolute', right: '30px', zIndex: 10000, opacity: currentIndex === 0 ? 0.3 : 1 }}
+          >›</button>
 
           {/* Lightbox Content Wrapper */}
           <div

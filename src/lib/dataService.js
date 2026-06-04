@@ -156,6 +156,56 @@ const supabaseService = {
     if (error) throw error;
   },
 
+  // ── Memes ────────────────────────────────────────
+  async loadMemes() {
+    const { data, error } = await supabase
+      .from("memes")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return data || [];
+  },
+
+  async insertMeme(imageUrl, caption, userId, creatorName) {
+    const { data, error } = await supabase
+      .from("memes")
+      .insert({ image_url: imageUrl, caption, user_id: userId, creator_name: creatorName })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteMeme(memeId) {
+    const { error } = await supabase.from("memes").delete().eq("id", memeId);
+    if (error) throw error;
+  },
+
+  async toggleMemeLike(memeId, userId) {
+    const { data: meme, error: fetchErr } = await supabase
+      .from("memes")
+      .select("liked_by")
+      .eq("id", memeId)
+      .single();
+    if (fetchErr) throw fetchErr;
+
+    let likedBy = Array.isArray(meme.liked_by) ? meme.liked_by : [];
+    if (likedBy.includes(userId)) {
+      likedBy = likedBy.filter(id => id !== userId);
+    } else {
+      likedBy.push(userId);
+    }
+
+    const { data, error: updateErr } = await supabase
+      .from("memes")
+      .update({ liked_by: likedBy })
+      .eq("id", memeId)
+      .select()
+      .single();
+    if (updateErr) throw updateErr;
+    return data;
+  },
+
   // ── Storage ──────────────────────────────────────
   async uploadFile(bucket, fileName, file) {
     const { error } = await supabase.storage.from(bucket).upload(fileName, file);
@@ -292,6 +342,57 @@ const localService = {
     const photos = stored ? JSON.parse(stored) : [];
     const updated = photos.map(p => p.id === photoId ? { ...p, caption } : p);
     localStorage.setItem("ramah_daily_photos", JSON.stringify(updated));
+  },
+
+  // ── Memes ────────────────────────────────────────
+  async loadMemes() {
+    const stored = localStorage.getItem("ramah_memes");
+    return stored ? JSON.parse(stored) : [];
+  },
+
+  async insertMeme(imageUrl, caption, userId, creatorName) {
+    const meme = {
+      id: Date.now().toString(),
+      created_at: new Date().toISOString(),
+      image_url: imageUrl,
+      caption,
+      user_id: userId,
+      creator_name: creatorName,
+      liked_by: []
+    };
+    const stored = localStorage.getItem("ramah_memes");
+    const memes = stored ? JSON.parse(stored) : [];
+    memes.unshift(meme);
+    localStorage.setItem("ramah_memes", JSON.stringify(memes));
+    return meme;
+  },
+
+  async deleteMeme(memeId) {
+    const stored = localStorage.getItem("ramah_memes");
+    const memes = stored ? JSON.parse(stored) : [];
+    const updated = memes.filter(m => m.id !== memeId);
+    localStorage.setItem("ramah_memes", JSON.stringify(updated));
+  },
+
+  async toggleMemeLike(memeId, userId) {
+    const stored = localStorage.getItem("ramah_memes");
+    const memes = stored ? JSON.parse(stored) : [];
+    let updatedMeme = null;
+    const updated = memes.map(m => {
+      if (m.id === memeId) {
+        let likedBy = Array.isArray(m.liked_by) ? m.liked_by : [];
+        if (likedBy.includes(userId)) {
+          likedBy = likedBy.filter(id => id !== userId);
+        } else {
+          likedBy.push(userId);
+        }
+        updatedMeme = { ...m, liked_by: likedBy };
+        return updatedMeme;
+      }
+      return m;
+    });
+    localStorage.setItem("ramah_memes", JSON.stringify(updated));
+    return updatedMeme;
   },
 
   // ── Storage ──────────────────────────────────────

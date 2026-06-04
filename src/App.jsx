@@ -5,6 +5,7 @@ import { usePackingList } from './hooks/usePackingList';
 import { useSuggestions } from './hooks/useSuggestions';
 import { useDailyPhotos } from './hooks/useDailyPhotos';
 import { useProfiles } from './hooks/useProfiles';
+import { useMemes } from './hooks/useMemes';
 import AuthScreen, { AvatarSVG } from './components/AuthScreen';
 import Countdown from './components/Countdown';
 import CommunityWall from './components/CommunityWall';
@@ -12,6 +13,7 @@ import PackingList from './components/PackingList';
 import LayaTip from './components/LayaTip';
 import Suggestions from './components/Suggestions';
 import DailyPhoto from './components/DailyPhoto';
+import MemesCorner from './components/MemesCorner';
 import AdminPanel from './components/AdminPanel';
 import ConfessionsCorner from './components/ConfessionsCorner';
 import BirthdaysCorner from './components/BirthdaysCorner';
@@ -51,6 +53,10 @@ export default function App() {
     updateProfileInState, handleDeleteUser, resetProfiles
   } = useProfiles();
 
+  const {
+    memes, loadMemes, handleCreateMeme, handleDeleteMeme, handleToggleMemeLike, resetMemes
+  } = useMemes();
+
   // ── Local UI state ───────────────────────────────
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [showProfileEdit, setShowProfileEdit] = useState(false);
@@ -67,6 +73,7 @@ export default function App() {
           loadSuggestions(),
           loadPackingData(user.id),
           loadDailyPhotos(),
+          loadMemes(),
           ...(user.email === ADMIN_EMAIL ? [loadPackingStatesAdmin()] : [])
         ]);
       } else if (user && !isSupabaseActive) {
@@ -74,6 +81,7 @@ export default function App() {
         await loadPackingData(user.id);
         await loadSuggestions();
         await loadDailyPhotos();
+        await loadMemes();
 
         const storedNewspaper = localStorage.getItem("ramah_newspaper");
         if (storedNewspaper) setNewspaperData(JSON.parse(storedNewspaper));
@@ -90,11 +98,13 @@ export default function App() {
         loadProfiles(),
         loadSuggestions(),
         loadPackingData(user.id),
-        loadDailyPhotos()
+        loadDailyPhotos(),
+        loadMemes()
       ]);
     } else {
       await loadPackingData(user.id);
       await loadSuggestions();
+      await loadMemes();
     }
   };
 
@@ -103,6 +113,7 @@ export default function App() {
     resetPacking();
     resetSuggestions();
     resetProfiles();
+    resetMemes();
   };
 
   const onSaveProfile = async (profileData) => {
@@ -226,6 +237,18 @@ export default function App() {
               progressPercentage={getProgressPercentage()}
             />
           </div>
+
+          {/* <div id="memes" style={{ scrollMarginTop: '15px' }}>
+            <MemesCorner
+              currentUser={currentUser}
+              isAdmin={isAdmin}
+              memes={memes}
+              databaseProfiles={databaseProfiles}
+              onCreateMeme={handleCreateMeme}
+              onDeleteMeme={handleDeleteMeme}
+              onToggleLike={handleToggleMemeLike}
+            />
+          </div> */}
 
           {/* <div id="newspaper" style={{ scrollMarginTop: '60px' }}>
             <CampNewspaper

@@ -47,5 +47,8 @@
 /* 14. Error boundary fallback UI */
 @import './styles/error-boundary.css';
 
-/* 15. Responsive overrides (always last) */
+/* 15. Memes corner styles */
+@import './styles/memes.css';
+
+/* 16. Responsive overrides (always last) */
 @import './styles/responsive.css';
