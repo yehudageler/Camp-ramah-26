@@ -44,5 +44,8 @@
 /* 13. Confessions corner (inactive – ready to enable) */
 @import './styles/confessions.css';
 
-/* 14. Responsive overrides (always last) */
+/* 14. Error boundary fallback UI */
+@import './styles/error-boundary.css';
+
+/* 15. Responsive overrides (always last) */
 @import './styles/responsive.css';

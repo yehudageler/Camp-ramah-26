@@ -1,0 +1,43 @@
+-- ==============================================================================
+-- הנחיות אבטחת Storage – הגבלת גודל וסוג קבצים ב-Supabase Buckets
+-- ==============================================================================
+--
+-- ⚠️ הגבלת גודל קובץ (File Size Limit) נעשית דרך ה-Dashboard של Supabase
+-- ולא דרך SQL policies. יש לבצע את השלבים הבאים:
+--
+-- 1. כנסו ל-Dashboard → Storage → Buckets
+-- 2. לחצו על ה-bucket הרלוונטי → Settings
+-- 3. הגדירו "File Size Limit":
+--    • avatars:      5 MB  (5242880 bytes)
+--    • daily-photos: 10 MB (10485760 bytes)
+--
+-- ═══════════════════════════════════════════════════════
+-- הגנה נוספת: הגבלת MIME types ב-Storage Policies
+-- ═══════════════════════════════════════════════════════
+--
+-- כרגע אין תמיכה ישירה ב-MIME type filtering ב-RLS policies של Supabase Storage.
+-- הפתרון הקיים:
+--   ✅ Client-side validation ב-imageUtils.js (JPEG, PNG, WebP, GIF בלבד, max 10MB)
+--   ✅ processImage() ממיר הכל ל-JPEG 85% quality לפני העלאה
+--
+-- בעתיד, אפשר להוסיף Edge Function שמוודא MIME type בשרת:
+--
+-- // supabase/functions/validate-upload/index.ts
+-- // import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+-- // serve(async (req) => {
+-- //   const contentType = req.headers.get('content-type');
+-- //   const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+-- //   if (!allowed.some(t => contentType?.includes(t))) {
+-- //     return new Response('Unsupported file type', { status: 415 });
+-- //   }
+-- //   // ... forward to storage
+-- // });
+--
+-- ==============================================================================
+-- סיכום מצב אבטחת Storage הנוכחי:
+-- ==============================================================================
+-- ✅ RLS מופעל על storage.objects
+-- ✅ Avatars: רק בעלים יכול להעלות/לעדכן (שם קובץ מתחיל ב-UID)
+-- ✅ Daily photos: רק admin יכול להעלות/למחוק
+-- ✅ Client-side: ולידציית MIME type + גודל ב-imageUtils.js
+-- ⚠️ חסר: הגבלת File Size Limit בהגדרות ה-Bucket (ראו שלבים 1-3 למעלה)

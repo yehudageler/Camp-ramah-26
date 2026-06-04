@@ -44,7 +44,7 @@ export default function ConfessionsCorner({ currentUser }) {
     if (isSupabaseActive) {
       try {
         const { error } = await supabase.from("suggestions").insert({
-          user_id: "anonymous_confession",
+          user_id: currentUser?.id || "anonymous",
           user_name: "אנונימי 🤫",
           text: confessionText
         });

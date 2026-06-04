@@ -8,9 +8,16 @@
  */
 export function processImage(file, { targetSize = 300, maxDim = 1200, forceSquare = false } = {}) {
   return new Promise((resolve, reject) => {
-    // וודא שמדובר בקובץ תמונה
-    if (!file.type.startsWith('image/')) {
-      return reject(new Error("הקובץ שנבחר אינו תמונה תקינה"));
+    // בדיקת סוג קובץ (MIME type)
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!file.type.startsWith('image/') || !ALLOWED_TYPES.includes(file.type)) {
+      return reject(new Error("סוג קובץ לא נתמך. יש להעלות JPEG, PNG, WebP או GIF"));
+    }
+
+    // הגבלת גודל קובץ (לפני עיבוד)
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    if (file.size > MAX_FILE_SIZE) {
+      return reject(new Error("הקובץ גדול מדי. גודל מקסימלי: 10MB"));
     }
 
     const reader = new FileReader();

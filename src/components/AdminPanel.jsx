@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ADMIN_EMAIL } from '../hooks/useAuth';
 
 export default function AdminPanel({ suggestions, counselors, packingStates, defaultPackingList, onDeleteUser, onDeleteSuggestion, onClose }) {
   const [activeTab, setActiveTab] = useState("suggestions");
@@ -148,7 +149,7 @@ export default function AdminPanel({ suggestions, counselors, packingStates, def
                             </div>
                           </td>
                           <td className="admin-td admin-td--center">
-                            {c.email !== 'geleryehuda@gmail.com' ? (
+                            {c.email !== ADMIN_EMAIL ? (
                               <button onClick={() => onDeleteUser(c.id)} className="admin-delete-btn">
                                 🗑️ הסר משתמש
                               </button>
@@ -184,7 +185,7 @@ export default function AdminPanel({ suggestions, counselors, packingStates, def
                         </div>
                       </div>
                       <div className="admin-counselor-actions">
-                        {c.email !== 'geleryehuda@gmail.com' ? (
+                        {c.email !== ADMIN_EMAIL ? (
                           <button onClick={() => onDeleteUser(c.id)} className="admin-delete-btn">
                             🗑️ הסר
                           </button>

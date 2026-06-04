@@ -296,6 +296,7 @@ export default function AuthScreen({ onAuthSuccess }) {
                   placeholder="ישראל ישראלי" 
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  maxLength={50}
                   required
                 />
               </div>
@@ -309,6 +310,7 @@ export default function AuthScreen({ onAuthSuccess }) {
                   placeholder="מדריכ/ת עדה, אגם, אומנות, נגרות..." 
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
+                  maxLength={30}
                   required
                 />
               </div>

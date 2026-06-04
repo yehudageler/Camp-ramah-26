@@ -38,14 +38,14 @@ export default function DailyPhoto({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isLightboxOpen, currentIndex, dailyPhotos.length]);
 
-  // Swipe for gallery and lightbox (RTL: swipe left = newer/future, swipe right = older/past)
+  // Swipe for gallery and lightbox (Swipe left = drag older from right, swipe right = drag newer from left)
   const gallerySwipe = useSwipe({
-    onSwipeLeft: () => { if (currentIndex > 0) setCurrentIndex(currentIndex - 1); },
-    onSwipeRight: () => { if (currentIndex < dailyPhotos.length - 1) setCurrentIndex(currentIndex + 1); },
+    onSwipeLeft: () => { if (currentIndex < dailyPhotos.length - 1) setCurrentIndex(currentIndex + 1); },
+    onSwipeRight: () => { if (currentIndex > 0) setCurrentIndex(currentIndex - 1); },
   });
   const lightboxSwipe = useSwipe({
-    onSwipeLeft: () => { if (currentIndex > 0) setCurrentIndex(currentIndex - 1); },
-    onSwipeRight: () => { if (currentIndex < dailyPhotos.length - 1) setCurrentIndex(currentIndex + 1); },
+    onSwipeLeft: () => { if (currentIndex < dailyPhotos.length - 1) setCurrentIndex(currentIndex + 1); },
+    onSwipeRight: () => { if (currentIndex > 0) setCurrentIndex(currentIndex - 1); },
   });
 
   const handleSaveCaption = async (e) => {
@@ -156,6 +156,7 @@ export default function DailyPhoto({
                         className="add-item-input"
                         style={{ flexGrow: 1, padding: '0.6rem 0.8rem', fontSize: '1rem', margin: 0, borderRadius: 'var(--radius-sm)', border: '2px solid var(--forest-green-light)', textAlign: 'center' }}
                         placeholder="הוסיפו כיתוב לתמונה..."
+                        maxLength={200}
                         autoFocus
                       />
                       <button type="submit" style={{ padding: '0.6rem 1rem', backgroundColor: 'var(--forest-green)', color: '#fff', fontSize: '0.9rem', borderRadius: 'var(--radius-sm)', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>שמור</button>
@@ -267,6 +268,7 @@ export default function DailyPhoto({
                 placeholder="הוסיפו כיתוב מעניין לתמונה..."
                 value={uploadCaption}
                 onChange={(e) => setUploadCaption(e.target.value)}
+                maxLength={200}
                 style={{ padding: '0.5rem 0.8rem', fontSize: '0.9rem' }}
               />
 
