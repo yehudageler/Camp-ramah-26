@@ -43,6 +43,7 @@
   flex-direction: column;
   gap: 0.6rem;
   overflow-y: auto;
+  overflow-x: hidden;
   flex-grow: 1;
 }
 
@@ -67,7 +68,7 @@
 
 @media (hover: hover) {
   .birthday-item:hover {
-    transform: translateX(-4px);
+    transform: translateY(-2px);
     box-shadow: var(--shadow-soft);
   }
 }
