@@ -6,7 +6,6 @@ import { dataService, isSupabaseActive } from '../lib/dataService';
  */
 export function useProfiles() {
   const [databaseProfiles, setDatabaseProfiles] = useState([]);
-  const [packingStates, setPackingStates] = useState([]);
 
   /**
    * טעינת כל הפרופילים
@@ -17,18 +16,6 @@ export function useProfiles() {
       setDatabaseProfiles(profiles);
     } catch (err) {
       console.error("Error loading profiles:", err);
-    }
-  }, []);
-
-  /**
-   * טעינת כל נתוני האריזה (admin only)
-   */
-  const loadPackingStatesAdmin = useCallback(async () => {
-    try {
-      const states = await dataService.loadAllPackingStates();
-      setPackingStates(states);
-    } catch (err) {
-      console.error("Error loading packing states for admin:", err);
     }
   }, []);
 
@@ -45,7 +32,7 @@ export function useProfiles() {
    * מחיקת משתמש (admin)
    */
   const handleDeleteUser = useCallback(async (userId) => {
-    if (!window.confirm("האם אתה בטוח שברצונך למחוק משתמש זה? כל נתוני האריזה והפרופיל שלו יימחקו מהקיר.")) return;
+    if (!window.confirm("האם אתה בטוח שברצונך למחוק משתמש זה? כל נתוני הפרופיל שלו יימחקו מהקיר.")) return;
 
     try {
       if (isSupabaseActive) {
@@ -61,7 +48,6 @@ export function useProfiles() {
       }
 
       setDatabaseProfiles(prev => prev.filter(p => p.id !== userId));
-      setPackingStates(prev => prev.filter(state => state.user_id !== userId));
     } catch (err) {
       console.error("Failed to delete user:", err);
     }
@@ -72,14 +58,11 @@ export function useProfiles() {
    */
   const resetProfiles = useCallback(() => {
     setDatabaseProfiles([]);
-    setPackingStates([]);
   }, []);
 
   return {
     databaseProfiles,
-    packingStates,
     loadProfiles,
-    loadPackingStatesAdmin,
     updateProfileInState,
     handleDeleteUser,
     resetProfiles

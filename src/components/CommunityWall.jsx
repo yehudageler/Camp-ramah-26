@@ -3,7 +3,7 @@ import CounselorCard from './CounselorCard';
 
 const mockCounselors = [];
 
-export default function CommunityWall({ currentUser, databaseProfiles, packingProgress }) {
+export default function CommunityWall({ currentUser, databaseProfiles }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [displayCount, setDisplayCount] = useState(10);
   const [viewMode, setViewMode] = useState("grid");
@@ -26,7 +26,6 @@ export default function CommunityWall({ currentUser, databaseProfiles, packingPr
         avatar: p.avatar,
         isCurrentUser: isMe,
         funStats: {
-          "סטטוס אריזה": isMe ? `${packingProgress}%` : "ממוצעת",
           "סובלנות ליתושים": isMe ? "בתהליכי הסתגלות" : "ממוצעת",
           "התמכרות לקמפינג": "65%",
           "שיר מועדף": "שיר השליחים 🎸"
@@ -41,7 +40,6 @@ export default function CommunityWall({ currentUser, databaseProfiles, packingPr
       avatar: currentUser.avatar,
       isCurrentUser: true,
       funStats: {
-        "סטטוס אריזה": `${packingProgress}%`,
         "סובלנות ליתושים": "בתהליכי הסתגלות",
         "התמכרות לקמפינג": "50%",
         "שיר מועדף": "פעולת שכבה!"

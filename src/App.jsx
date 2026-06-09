@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react';
 import { isSupabaseActive } from './lib/dataService';
 import { useAuth, ADMIN_EMAIL } from './hooks/useAuth';
-import { usePackingList } from './hooks/usePackingList';
 import { useSuggestions } from './hooks/useSuggestions';
 import { useDailyPhotos } from './hooks/useDailyPhotos';
 import { useProfiles } from './hooks/useProfiles';
 import { useMemes } from './hooks/useMemes';
 import AuthScreen, { AvatarSVG } from './components/AuthScreen';
-import Countdown from './components/Countdown';
+import WelcomeBanner from './components/WelcomeBanner';
 import CommunityWall from './components/CommunityWall';
-import PackingList from './components/PackingList';
 import LayaTip from './components/LayaTip';
 import Suggestions from './components/Suggestions';
 import DailyPhoto from './components/DailyPhoto';
@@ -20,7 +18,6 @@ import BirthdaysCorner from './components/BirthdaysCorner';
 import ProfileEditModal from './components/ProfileEditModal';
 import NavigationBar from './components/NavigationBar';
 import CampNewspaper from './components/CampNewspaper';
-import { defaultPackingList } from './constants/packingList';
 
 export default function App() {
   // ── Hooks ────────────────────────────────────────
@@ -30,11 +27,6 @@ export default function App() {
     handleSaveProfile, handleUpdateAvatar
   } = useAuth();
 
-  const {
-    checkedStates, customItems,
-    loadPackingData, handleToggleItem, handleAddItem,
-    handleDeletePackingItem, getProgressPercentage, resetPacking
-  } = usePackingList();
 
   const {
     suggestions,
@@ -48,8 +40,8 @@ export default function App() {
   } = useDailyPhotos();
 
   const {
-    databaseProfiles, packingStates,
-    loadProfiles, loadPackingStatesAdmin,
+    databaseProfiles,
+    loadProfiles,
     updateProfileInState, handleDeleteUser, resetProfiles
   } = useProfiles();
 
@@ -71,14 +63,11 @@ export default function App() {
         await Promise.all([
           loadProfiles(),
           loadSuggestions(),
-          loadPackingData(user.id),
           loadDailyPhotos(),
-          loadMemes(),
-          ...(user.email === ADMIN_EMAIL ? [loadPackingStatesAdmin()] : [])
+          loadMemes()
         ]);
       } else if (user && !isSupabaseActive) {
         // Local mode – load from localStorage
-        await loadPackingData(user.id);
         await loadSuggestions();
         await loadDailyPhotos();
         await loadMemes();
@@ -97,12 +86,10 @@ export default function App() {
       await Promise.all([
         loadProfiles(),
         loadSuggestions(),
-        loadPackingData(user.id),
         loadDailyPhotos(),
         loadMemes()
       ]);
     } else {
-      await loadPackingData(user.id);
       await loadSuggestions();
       await loadMemes();
     }
@@ -110,7 +97,6 @@ export default function App() {
 
   const onLogout = async () => {
     await logoutUser();
-    resetPacking();
     resetSuggestions();
     resetProfiles();
     resetMemes();
@@ -129,9 +115,6 @@ export default function App() {
     }
   };
 
-  const onToggleItem = (itemId) => handleToggleItem(itemId, currentUser?.id);
-  const onAddItem = (text) => handleAddItem(text, currentUser?.id);
-  const onDeletePackingItem = (itemId) => handleDeletePackingItem(itemId, currentUser?.id);
   const onSubmitSuggestion = (text) => handleSubmitSuggestion(text, currentUser);
 
   const handleUpdateNewspaper = (data) => {
@@ -207,7 +190,7 @@ export default function App() {
           <NavigationBar />
 
           <div className="hero-grid">
-            <Countdown />
+            <WelcomeBanner currentUser={currentUser} />
             <div id="gallery" style={{ height: '100%', scrollMarginTop: '15px' }}>
               <DailyPhoto
                 isAdmin={isAdmin}
@@ -223,18 +206,6 @@ export default function App() {
             <CommunityWall
               currentUser={currentUser}
               databaseProfiles={databaseProfiles}
-              packingProgress={getProgressPercentage()}
-            />
-          </div>
-
-          <div id="packing" style={{ scrollMarginTop: '15px' }}>
-            <PackingList
-              checkedStates={checkedStates}
-              customItems={customItems}
-              onToggleItem={onToggleItem}
-              onDeleteItem={onDeletePackingItem}
-              onAddItem={onAddItem}
-              progressPercentage={getProgressPercentage()}
             />
           </div>
 
@@ -282,8 +253,7 @@ export default function App() {
         <AdminPanel
           suggestions={suggestions}
           counselors={databaseProfiles}
-          packingStates={packingStates}
-          defaultPackingList={defaultPackingList}
+          dailyPhotos={dailyPhotos}
           onDeleteUser={handleDeleteUser}
           onDeleteSuggestion={handleDeleteSuggestion}
           onClose={() => setShowAdminPanel(false)}

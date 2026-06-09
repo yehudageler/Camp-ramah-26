@@ -4,7 +4,7 @@ const SECTIONS = [
   { id: 'home', label: 'ראשי', icon: '⛺' },
   { id: 'gallery', label: 'התמונה היומית', icon: '📸' },
   { id: 'community', label: 'קהילה', icon: '👥' },
-  { id: 'packing', label: 'רשימת ציוד', icon: '🎒' },
+  // { id: 'packing', label: 'רשימת ציוד', icon: '🎒' },
   // { id: 'memes', label: 'פינת המימים', icon: '🎭' },
   // { id: 'laya-tip', label: 'כרטיס לאיה', icon: '💳' },
   // { id: 'newspaper', label: 'העיתון', icon: '🗞️' },

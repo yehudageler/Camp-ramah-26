@@ -103,3 +103,13 @@
   color: var(--campfire-amber);
   font-weight: 600;
 }
+
+/* Hero grid layout (Welcome banner + Daily Photo side-by-side) */
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: stretch;
+  margin-bottom: 2rem;
+}
+

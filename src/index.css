@@ -12,14 +12,12 @@
 /* 3. Dashboard header */
 @import './styles/dashboard.css';
 
-/* 4. Countdown timer */
-@import './styles/countdown.css';
+/* 4. Welcome banner */
+@import './styles/welcome-banner.css';
 
 /* 5. Community wall & counselor cards */
 @import './styles/community.css';
 
-/* 6. Interactive packing list */
-@import './styles/packing.css';
 
 /* 7. Suggestions, daily photo gallery & Laya tip */
 @import './styles/suggestions.css';
