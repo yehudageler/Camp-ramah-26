@@ -151,6 +151,33 @@ export default function DailyPhoto({
     }
   };
 
+  const handleDownload = async (imageUrl, caption) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      
+      const cleanCaption = caption 
+        ? caption.trim().slice(0, 30).replace(/[^a-zA-Z0-9א-ת\s]/g, "") 
+        : "";
+      link.download = `${cleanCaption || "daily-photo"}.jpg`;
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+      toast.success("ההורדה התחילה! 📥");
+    } catch (err) {
+      console.error("Failed to download image:", err);
+      // Fallback: Open in new tab
+      window.open(imageUrl, '_blank');
+    }
+  };
+
   return (
     <>
       <div className="gallery-card">
@@ -232,12 +259,21 @@ export default function DailyPhoto({
 
               {/* Date & Carousel Controls */}
               <div className="gallery-controls">
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem', width: '100%' }}>
-                  <span className="gallery-date-badge">
-                    <span>📅</span> הועלה ב-{new Date(dailyPhotos[currentIndex].created_at).toLocaleDateString("he-IL")}
-                  </span>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', width: '100%' }}>
+                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    <span className="gallery-date-badge">
+                      <span>📅</span> הועלה ב-{new Date(dailyPhotos[currentIndex].created_at).toLocaleDateString("he-IL")}
+                    </span>
+                    <button
+                      onClick={() => handleDownload(dailyPhotos[currentIndex].image_data, dailyPhotos[currentIndex].caption)}
+                      className="gallery-download-btn"
+                      title="הורד תמונה 📥"
+                    >
+                      📥 הורדה
+                    </button>
+                  </div>
                   {isAdmin && (
-                    <button onClick={handleDeleteCurrent} className="gallery-delete-btn">
+                    <button onClick={handleDeleteCurrent} className="gallery-delete-btn" style={{ margin: 0 }}>
                       🗑️ מחיקת תמונה
                     </button>
                   )}
@@ -423,6 +459,27 @@ export default function DailyPhoto({
                 <span>📅 הועלה ב-{new Date(dailyPhotos[currentIndex].created_at).toLocaleDateString("he-IL")}</span>
                 <span className="lightbox-caption-separator">|</span>
                 <span>תמונה {currentIndex + 1} מתוך {dailyPhotos.length}</span>
+                <span className="lightbox-caption-separator">|</span>
+                <button
+                  onClick={() => handleDownload(dailyPhotos[currentIndex].image_data, dailyPhotos[currentIndex].caption)}
+                  className="lightbox-download-link"
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--campfire-amber)',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    fontSize: '0.8rem',
+                    padding: 0,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.25rem',
+                    fontFamily: 'inherit'
+                  }}
+                  title="הורד תמונה 📥"
+                >
+                  📥 הורדה
+                </button>
               </div>
             </div>
           </div>

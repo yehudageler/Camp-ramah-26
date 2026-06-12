@@ -303,3 +303,39 @@
 .lightbox-caption-separator {
   color: rgba(255, 255, 255, 0.3);
 }
+
+.gallery-download-btn {
+  font-size: 0.82rem;
+  color: var(--forest-green);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--forest-green-light);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  padding: 0.3rem 0.8rem;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  direction: rtl;
+}
+
+.gallery-download-btn:hover {
+  background: var(--forest-green);
+  color: #ffffff;
+  border-color: var(--forest-green);
+  transform: translateY(-1px);
+}
+
+.gallery-download-btn:active {
+  transform: translateY(0);
+}
+
+.lightbox-download-link {
+  transition: opacity 0.2s ease;
+}
+
+.lightbox-download-link:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
