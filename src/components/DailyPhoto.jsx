@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { processImage } from '../lib/imageUtils';
 import toast from 'react-hot-toast';
 import { useSwipe } from '../hooks/useSwipe';
 
@@ -82,17 +81,30 @@ export default function DailyPhoto({
     }
   };
 
-  const handleFileChange = async (e) => {
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      try {
-        const processed = await processImage(file, { maxDim: 1200 });
-        setSelectedFile(processed.file);
-        setPreviewUrl(processed.dataUrl);
-      } catch (err) {
-        console.error("Error processing photo:", err);
-        toast.error("שגיאה בעיבוד התמונה. נא לנסות קובץ אחר.");
+      const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+      if (!file.type.startsWith('image/') || !ALLOWED_TYPES.includes(file.type)) {
+        toast.error("סוג קובץ לא נתמך. יש להעלות JPEG, PNG, WebP או GIF");
+        return;
       }
+      
+      const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error("הקובץ גדול מדי. גודל מקסימלי: 15MB");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setSelectedFile(file);
+        setPreviewUrl(event.target.result);
+      };
+      reader.onerror = () => {
+        toast.error("שגיאה בקריאת הקובץ");
+      };
+      reader.readAsDataURL(file);
     }
   };
 
